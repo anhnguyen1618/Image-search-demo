@@ -6,3 +6,8 @@ services:
         build: .
         ports:
             - "5000:5000"
+    mongo:
+        container_name: mongo
+        image: mongo:4.2.0
+        ports:
+            - "1048:27017"

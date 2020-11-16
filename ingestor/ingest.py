@@ -1,5 +1,5 @@
-import sys
-import os
+import sys, os, json
+
 sys.path.append(os.path.abspath('../bucket'))
 sys.path.append(os.path.abspath('../utilities'))
 
@@ -12,10 +12,7 @@ class Ingestor:
         self.bucket = Bucket(bucket_name)
         self.bucket_name = bucket_name
         host_name = "localhost"
-        queue_name = "images"
         self.publisher = Publisher({"hostname": host_name, "queue_name": queue_name})
-    
-
     
     def read_dir(self, dir_path):
         return [f"{dir_path}/{file}" for file in os.listdir(dir_path) if allowed_file(file)]
@@ -29,11 +26,16 @@ class Ingestor:
 
         print(f"Done with uploading {len(file_names)} images to bucket {self.bucket_name}")
 
+    def close(self):
+        self.publisher.close()
+
 if __name__ == "__main__":
     BUCKET_NAME = "images-search"
-    QUEUE_NAME = "images-search"
+    model_name = "resnet"
+    QUEUE_NAME = model_name 
 
     ingestor = Ingestor(BUCKET_NAME, QUEUE_NAME)
     ingestor.upload_folder("../dataset")
+    ingestor.close()
 
 

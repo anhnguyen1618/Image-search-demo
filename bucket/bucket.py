@@ -17,7 +17,10 @@ class Bucket:
         return bucket_file_name 
 
     def download(self, file_name, local_downloaded_dir):
-        blob = bucket.blob(file_name)
+        blob = self.bucket.blob(file_name)
         if blob.exists():
             file_loc = os.path.join(local_downloaded_dir, file_name)
             blob.download_to_filename(file_loc)
+            return local_downloaded_dir + "/" + file_name
+
+        return None

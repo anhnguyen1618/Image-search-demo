@@ -1,7 +1,7 @@
 from flask import Flask, abort, render_template, request
 import uuid, os, json
 from numpyencoder import NumpyEncoder
-from extractor import model_picker, extract_features
+from extractors import model_picker, extract_features
 
 app = Flask(__name__)
 
