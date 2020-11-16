@@ -7,12 +7,13 @@ app = Flask(__name__)
 
 FILE_UPLOAD_DIR = os.getcwd() + "/files"
 app = Flask(__name__, static_url_path = FILE_UPLOAD_DIR)
-ALLOWED_EXTENSIONS = ["jpg", "png"]
+
 
 model_name = 'resnet'
 model = model_picker(model_name)
 
 def allowed_file(filename):
+    ALLOWED_EXTENSIONS = ["jpg", "png", "jpeg"]
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
