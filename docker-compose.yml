@@ -1,0 +1,22 @@
+version: "2"
+services:
+    serving:
+        container_name: extractor_rest_test 
+        image: extractor_rest:v2 
+        build: ./extractors
+        ports:
+            - "5000:5000"
+    indexing:
+        container_name: indexing
+        image: indexing:v2
+        build: ./index
+        ports:
+            - "9000:5000"
+    mongo_test:
+        container_name: mongo_test
+        image: mongo:4.2.0
+        volumes:
+            - ./mongo-volume:/data/db
+        ports:
+            - "1048:27017"
+    

@@ -1,16 +1,17 @@
 from flask import Flask, abort, render_template, request
+import requests
 import uuid, os, json
 from numpyencoder import NumpyEncoder
 from extractors import model_picker, extract_features
 
-app = Flask(__name__)
 
 FILE_UPLOAD_DIR = os.getcwd() + "/files"
-app = Flask(__name__, static_url_path = FILE_UPLOAD_DIR)
-
-
+INDEX_URL = "http://indexing:5000"
 model_name = 'resnet'
 model = model_picker(model_name)
+
+app = Flask(__name__, static_url_path = FILE_UPLOAD_DIR)
+
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = ["jpg", "png", "jpeg"]
@@ -34,7 +35,11 @@ def search():
         file = request.files['record']
         path = save_file(file)
         feature_vector = extract_features(path, model)
-        return json.dumps(feature_vector, cls=NumpyEncoder)
+
+        # payload = json.dumps(feature_vector, cls=NumpyEncoder)
+        payload = feature_vector.tolist()
+        res = requests.post(INDEX_URL+"/search", json=payload)
+        return res.content
     
     return "file format is not acceptable", 500
 

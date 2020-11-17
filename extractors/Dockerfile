@@ -5,7 +5,7 @@ COPY ./requirements.txt ./
 RUN pip install -r requirements.txt
 
 COPY extractor_server.py extractor_server.py
-COPY extractor.py extractor.py
+COPY extractors.py extractors.py
 COPY ./templates/index.html ./templates/index.html
 RUN mkdir files
 
