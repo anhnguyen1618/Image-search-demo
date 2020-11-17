@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongos
+  labels:
+    name: mongos
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: mongos
+  template:
+    metadata:
+      labels:
+        name: mongos
+    spec:
+      containers:
+      - name: mongodb-mongos-container
+        image: mongo:3.6.6
+        command:
+          - "mongos"
+          - "--port"
+          - "27017"
+          - "--bind_ip"
+          - "0.0.0.0"
+          - "--configdb"
+          - "cfgrs/configdb-0.configdb:27017, configdb-1.configdb:27017, configdb-0.configdb:27017"
+        ports:
+        - containerPort: 27017              	
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongos
+  labels:
+    name: mongos
+spec:
+  type: LoadBalancer
+  #externalIPs:
+  #- 192.168.0.10
+  ports:
+  - port: 27017
+    protocol: TCP
+  selector:
+    name: mongos
