@@ -50,6 +50,7 @@ class Worker:
         self.db[self.model_name].insert_one({"url": self.get_public_url(file_name), "feature": feature.tolist()})
         print(feature)
         print("-------------------------------")
+        self.channel.basic_ack(delivery_tag=method.delivery_tag)
 
 
 if __name__ == '__main__':

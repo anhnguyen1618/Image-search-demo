@@ -39,7 +39,8 @@ def search():
         # payload = json.dumps(feature_vector, cls=NumpyEncoder)
         payload = feature_vector.tolist()
         res = requests.post(INDEX_URL+"/search", json=payload)
-        return res.content
+        return render_template("index.html", results = res.json())
+        # return res.content
     
     return "file format is not acceptable", 500
 

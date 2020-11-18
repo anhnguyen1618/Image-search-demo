@@ -16,7 +16,10 @@ def hello():
 
 @app.route("/search", methods=["POST"])
 def search():
+    print("run into search")
     results = index.query(request.get_json())
+    # results = index.query(index.test())
+    # print("index results", results)
     return json.dumps(results)
 
 if __name__ == "__main__":

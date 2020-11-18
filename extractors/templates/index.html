@@ -20,6 +20,10 @@
 
             </form>
 
+            {% for item in results %}
+                <img src={{ item["url"] }} height="300px" />
+                <text>{{item["score"]}} </text>
+            {% endfor %}
         </div>
     </div>
 </div>
