@@ -1,10 +1,8 @@
 import pika, sys, os
 from pymongo import MongoClient
 
-
 sys.path.append(os.path.abspath('../bucket'))
 sys.path.append(os.path.abspath('../extractors'))
-
 from bucket import Bucket
 from extractors import model_picker, extract_features
 

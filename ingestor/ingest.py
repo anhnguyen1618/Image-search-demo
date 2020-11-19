@@ -35,7 +35,9 @@ if __name__ == "__main__":
     QUEUE_NAME = model_name 
 
     ingestor = Ingestor(BUCKET_NAME, QUEUE_NAME)
-    ingestor.upload_folder("../dataset")
+    data_dir = "../dataset"
+    data_dir = "../sample"
+    ingestor.upload_folder(data_dir)
     ingestor.close()
 
 
