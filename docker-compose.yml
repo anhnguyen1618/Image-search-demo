@@ -6,17 +6,70 @@ services:
         build: ./extractors
         ports:
             - "5000:5000"
-    indexing:
-        container_name: indexing
-        image: indexing:v2
+        environment:
+            - TOTAL_NUM_INDEXES=2
+            - ML_MODEL="resnet"
+        volumes:
+            - ./extractors:/usr/app
+
+    indexing-0:
+        container_name: indexing-0
+        image: indexing
         build: ./index
         ports:
             - "9000:5000"
-    mongo_test:
-        container_name: mongo_test
+        environment:
+            - TOTAL_NUM_INDEXES=2
+            - CURRENT_INDEX=0
+            - ML_MODEL="resnet"
+        volumes:
+            - ./index:/usr/app
+        depends_on: 
+            - mongos
+
+    indexing-1:
+        container_name: indexing-1
+        image: indexing
+        build: ./index
+        ports:
+            - "9001:5000"
+        environment:
+            - TOTAL_NUM_INDEXES=2
+            - CURRENT_INDEX=1
+            - ML_MODEL="resnet"
+        volumes:
+            - ./index:/usr/app
+        depends_on: 
+            - mongos
+
+    extract_worker:
+        container_name: extract_worker
+        build: 
+            context: ./ 
+            dockerfile: extract_worker/Dockerfile
+        image: extract_worker 
+        depends_on: 
+            - rabbitmq
+
+    rabbitmq:
+        image: "rabbitmq:3-management"
+        ports:
+        - "7672:5672"
+        - "7000:15672"
+        volumes:
+        - './rabbitmq_data:/data'
+    
+    rabbitmq_wrapper:
+        container_name: rabbitmq_wrapper
+        image: rabbitmq_wrapper
+        build: ./rabbitmq_wrapper
+        ports:
+            - "8000:5000"
+
+    mongos:
+        container_name: mongos
         image: mongo:4.2.0
         volumes:
             - ./mongo-volume:/data/db
         ports:
             - "1048:27017"
-    

@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: serving 
+  name: indexing-1 
 spec:
   selector:
-    app: serving 
+    app: indexing-1 
   ports:
   - protocol: "TCP"
     port: 5000
@@ -13,39 +13,29 @@ spec:
 
 ---
 apiVersion: apps/v1 
-kind: StatefulSet 
+kind: Deployment 
 metadata:
-  name: serving 
+  name: indexing-1 
 spec:
   replicas: 1 
   selector:
     matchLabels:
-      app: serving 
+      app: indexing-1 
   template:
     metadata:
       labels:
-        app: serving 
+        app: indexing-1 
     spec:
       containers:
-      - name: serving 
-        image: zozonguyen/serving:latest
+      - name: indexing-1 
+        image: zozonguyen/indexing:latest
         imagePullPolicy: Always 
         ports:
         - containerPort: 5000
-        volumeMounts:
-          - name: file-claim
-            mountPath: /usr/app/files
         env:
         - name: TOTAL_NUM_INDEXES 
           value: "2"
+        - name: CURRENT_INDEX 
+          value: "1"
         - name: ML_MODEL 
-          value: "resnet"
-
-  volumeClaimTemplates:
-  - metadata:
-      name: file-claim
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 100Mi
+          value: "resnet" 

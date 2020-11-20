@@ -1,12 +1,16 @@
 from flask import Flask, abort, render_template, request
-import requests
+import requests, asyncio
 import uuid, os, json
 from numpyencoder import NumpyEncoder
 from extractors import model_picker, extract_features
 
+TOTAL_NUM_INDEXES = int(os.getenv('TOTAL_NUM_INDEXES', 1))
+# TODO: use model to fetch correct service later
+ML_MODEL = os.getenv('ML_MODEL', "resnet")
 
 FILE_UPLOAD_DIR = os.getcwd() + "/files"
-INDEX_URL = "http://indexing:5000"
+INDEX_URL = "http://indexing"
+PORT=5000
 model_name = 'resnet'
 model = model_picker(model_name)
 
@@ -25,6 +29,38 @@ def save_file(file):
     file.save(file_path)
     return file_path
 
+async def aggregate(payload, res):
+    # res = requests.post(INDEX_URL+"/search", json=payload)
+    results = []
+    loop = asyncio.get_event_loop()
+    futures = [
+        loop.run_in_executor(
+            None, 
+            requests.post,
+            f"{INDEX_URL}-{index}:{PORT}/search",
+            None,
+            payload
+        )
+        for index in range(max(TOTAL_NUM_INDEXES, 1))
+    ]
+    for response in await asyncio.gather(*futures):
+        if response.status_code != 200:
+            print(f"Error fetching results from {response.url}")
+            continue
+
+        results += response.json()
+        print(response.json(), flush=True)
+        
+    res["results"] = results 
+
+def search_from_index(payload, num_records=5):
+    loop = asyncio.new_event_loop()
+    res = {"results":[]}
+    loop.run_until_complete(aggregate(payload, res))
+    res["results"].sort(key=lambda x: x["distance"])
+    return res["results"][:num_records]
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -38,8 +74,9 @@ def search():
 
         # payload = json.dumps(feature_vector, cls=NumpyEncoder)
         payload = feature_vector.tolist()
-        res = requests.post(INDEX_URL+"/search", json=payload)
-        return render_template("index.html", results = res.json())
+
+        results = search_from_index(payload)
+        return render_template("index.html", results = results)
         # return res.content
     
     return "file format is not acceptable", 500

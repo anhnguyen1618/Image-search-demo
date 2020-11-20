@@ -1,18 +1,26 @@
 from index import Index
-import json
+import json, os
 from flask import Flask, request
 
 app = Flask(__name__)
 
-print("run in to main here")
-mongo_address = "mongo_test:27017"
+TOTAL_NUM_INDEXES = int(os.getenv('TOTAL_NUM_INDEXES', 1))
+CURRENT_INDEX = int(os.getenv('CURRENT_INDEX', 0))
+ML_MODEL = os.getenv('ML_MODEL', "resnet")
+
+mongo_address = "mongos:27017"
 # mongo_address = "127.0.0.1:1048"
-model_name = "resnet"
-index = Index(mongo_address, model_name)
+model_name = ML_MODEL 
+index = Index(mongo_address, model_name, TOTAL_NUM_INDEXES, CURRENT_INDEX)
 
 @app.route("/")
 def hello():
     return "tests"
+
+@app.route("/reindex")
+def reindex():
+    index = Index(mongo_address, model_name, TOTAL_NUM_INDEXES, CURRENT_INDEX)
+    return f"Done indexing {len(index.records)}"
 
 @app.route("/search", methods=["POST"])
 def search():

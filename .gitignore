@@ -3,3 +3,5 @@ sample
 tmp
 __pycache__/
 mongo-volume
+test/
+files/

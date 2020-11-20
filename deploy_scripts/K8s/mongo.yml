@@ -1,46 +1,40 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: serving 
+  name: mongos 
 spec:
   selector:
-    app: serving 
+    app: mongos 
   ports:
   - protocol: "TCP"
-    port: 5000
-    targetPort: 5000
+    port: 27017 
+    targetPort: 27017 
   type: LoadBalancer
 
 ---
 apiVersion: apps/v1 
 kind: StatefulSet 
 metadata:
-  name: serving 
+  name: mongos 
 spec:
   replicas: 1 
   selector:
     matchLabels:
-      app: serving 
+      app: mongos 
   template:
     metadata:
       labels:
-        app: serving 
+        app: mongos 
     spec:
       containers:
-      - name: serving 
-        image: zozonguyen/serving:latest
-        imagePullPolicy: Always 
+      - name: mongos 
+        image: mongo:4.2.0
+        imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 5000
+        - containerPort: 27017
         volumeMounts:
           - name: file-claim
-            mountPath: /usr/app/files
-        env:
-        - name: TOTAL_NUM_INDEXES 
-          value: "2"
-        - name: ML_MODEL 
-          value: "resnet"
-
+            mountPath: /data/db  
   volumeClaimTemplates:
   - metadata:
       name: file-claim

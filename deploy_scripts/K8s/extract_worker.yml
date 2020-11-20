@@ -1,45 +1,31 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: serving 
-spec:
-  selector:
-    app: serving 
-  ports:
-  - protocol: "TCP"
-    port: 5000
-    targetPort: 5000
-  type: LoadBalancer
-
----
 apiVersion: apps/v1 
 kind: StatefulSet 
 metadata:
-  name: serving 
+  name: extract-worker 
 spec:
   replicas: 1 
   selector:
     matchLabels:
-      app: serving 
+      app: extract-worker 
   template:
     metadata:
       labels:
-        app: serving 
+        app: extract-worker 
     spec:
       containers:
-      - name: serving 
-        image: zozonguyen/serving:latest
-        imagePullPolicy: Always 
+      - name: extract-worker 
+        image: zozonguyen/extract_worker:latest
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
         volumeMounts:
           - name: file-claim
-            mountPath: /usr/app/files
+            mountPath: /usr/app/tmp
         env:
-        - name: TOTAL_NUM_INDEXES 
-          value: "2"
         - name: ML_MODEL 
           value: "resnet"
+        - name: TOTAL_NUM_INDEXES 
+          value: "2"
 
   volumeClaimTemplates:
   - metadata:
