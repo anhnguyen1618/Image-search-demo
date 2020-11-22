@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: indexing-{model}-{index_num} 
+spec:
+  selector:
+    app: indexing-{model}-{index_num} 
+  ports:
+  - protocol: "TCP"
+    port: 5000
+    targetPort: 5000
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1 
+kind: Deployment 
+metadata:
+  name: indexing-{model}-{index_num} 
+spec:
+  replicas: {num_pods} 
+  selector:
+    matchLabels:
+      app: indexing-{model}-{index_num} 
+  template:
+    metadata:
+      labels:
+        app: indexing-{model}-{index_num} 
+    spec:
+      containers:
+      - name: indexing-{model}-{index_num} 
+        image: zozonguyen/indexing:latest
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 5000
+        env:
+        - name: TOTAL_NUM_INDEXES 
+          value: "{num_indexes}"
+        - name: CURRENT_INDEX 
+          value: "{index_num}"
+        - name: ML_MODEL 
+          value: "{model}" 

@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: serving-resnet 
+spec:
+  selector:
+    app: serving-resnet
+  ports:
+  - protocol: "TCP"
+    port: 5000
+    targetPort: 5000
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1 
+kind: StatefulSet 
+metadata:
+  name: serving-resnet
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: serving-resnet 
+  template:
+    metadata:
+      labels:
+        app: serving-resnet 
+    spec:
+      containers:
+      - name: serving-resnet 
+        image: zozonguyen/serving:latest
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+          - name: file-claim
+            mountPath: /usr/app/files
+        env:
+        - name: TOTAL_NUM_INDEXES 
+          value: "2"
+        - name: ML_MODEL 
+          value: "resnet"
+
+  volumeClaimTemplates:
+  - metadata:
+      name: file-claim
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 100Mi

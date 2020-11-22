@@ -1,0 +1,32 @@
+{
+  "services": [
+    {
+      "name": "extract_worker",
+      "models": [
+        {
+          "name": "resnet",
+          "pods": 2
+        }
+      ]
+    },
+    {
+      "name": "indexing",
+      "models": [
+        {
+          "name": "resnet",
+          "num_indexes": 2,
+          "pods": 2
+        }
+      ]
+    },
+    {
+      "name": "serving",
+      "models": [
+        {
+          "name": "resnet",
+          "pods": 1
+        }
+      ] 
+    }
+  ]
+}

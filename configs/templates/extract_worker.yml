@@ -1,0 +1,35 @@
+apiVersion: apps/v1 
+kind: StatefulSet 
+metadata:
+  name: extract-worker-{model}
+spec:
+  replicas: {num_pods} 
+  selector:
+    matchLabels:
+      app: extract-worker-{model}
+  template:
+    metadata:
+      labels:
+        app: extract-worker-{model}
+    spec:
+      containers:
+      - name: extract-worker-{model}
+        image: zozonguyen/extract_worker:latest
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+          - name: file-claim
+            mountPath: /usr/app/tmp
+        env:
+        - name: ML_MODEL 
+          value: "{model}"
+
+  volumeClaimTemplates:
+  - metadata:
+      name: file-claim
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 100Mi
