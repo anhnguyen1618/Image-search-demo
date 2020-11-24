@@ -9,7 +9,7 @@ TOTAL_NUM_INDEXES = int(os.getenv('TOTAL_NUM_INDEXES', 1))
 ML_MODEL = os.getenv('ML_MODEL', "resnet")
 
 FILE_UPLOAD_DIR = os.getcwd() + "/files"
-INDEX_URL = "http://indexing"
+INDEX_URL = f"http://indexing-{ML_MODEL}"
 PORT=5000
 model_name = 'resnet'
 model = model_picker(model_name)
@@ -41,7 +41,7 @@ async def aggregate(payload, res):
             None,
             payload
         )
-        for index in range(max(TOTAL_NUM_INDEXES, 1))
+        for index in range(1, TOTAL_NUM_INDEXES + 1)
     ]
     for response in await asyncio.gather(*futures):
         if response.status_code != 200:

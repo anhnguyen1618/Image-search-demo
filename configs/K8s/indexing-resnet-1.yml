@@ -34,7 +34,7 @@ spec:
         - containerPort: 5000
         env:
         - name: TOTAL_NUM_INDEXES 
-          value: "2"
+          value: "1"
         - name: CURRENT_INDEX 
           value: "1"
         - name: ML_MODEL 

@@ -107,19 +107,22 @@ class Generator:
     def get_generator(self, data):
         return self.generator_mappings.get(data["name"], Common_generator)(data)
 
-def clean_and_apply():
+def execute(cmd):
+    commands = cmd.split("&&")
+    for cmd in commands:
+        cmd = cmd.strip()
+        subprocess.run(cmd.split(" "))
 
-    processes = []
+def clean_and_apply():
     stage_files = set(os.listdir(stage_dir))
     for cur_file in os.listdir(main_dir):
         if cur_file not in stage_files:
-            print("run here")
-            processes.append(subprocess.Popen(["oc", "delete", "-f", f"{main_dir}/{cur_file}"]))
+            execute(f"oc delete -f {main_dir}/{cur_file}")
 
-    for process in processes:
-        process.wait()
-
-    os.popen(f"rm -r {main_dir} && mv {stage_dir} {main_dir} && mkdir {stage_dir} && oc apply -f {main_dir}")
+    os.chdir("..")
+    execute("./build-docker-img.sh")
+    os.chdir("configs")
+    execute(f"rm -r {main_dir} && mv {stage_dir} {main_dir} && mkdir {stage_dir}  && oc apply -f {main_dir}")
 
 if __name__ == '__main__':
     if not os.path.exists(stage_dir):

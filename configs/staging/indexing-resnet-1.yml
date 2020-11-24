@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: indexing-resnet-2 
+  name: indexing-resnet-1 
 spec:
   selector:
-    app: indexing-resnet-2 
+    app: indexing-resnet-1 
   ports:
   - protocol: "TCP"
     port: 5000
@@ -15,27 +15,27 @@ spec:
 apiVersion: apps/v1 
 kind: Deployment 
 metadata:
-  name: indexing-resnet-2 
+  name: indexing-resnet-1 
 spec:
   replicas: 2 
   selector:
     matchLabels:
-      app: indexing-resnet-2 
+      app: indexing-resnet-1 
   template:
     metadata:
       labels:
-        app: indexing-resnet-2 
+        app: indexing-resnet-1 
     spec:
       containers:
-      - name: indexing-resnet-2 
+      - name: indexing-resnet-1 
         image: zozonguyen/indexing:latest
         imagePullPolicy: Always 
         ports:
         - containerPort: 5000
         env:
         - name: TOTAL_NUM_INDEXES 
-          value: "2"
+          value: "1"
         - name: CURRENT_INDEX 
-          value: "2"
+          value: "1"
         - name: ML_MODEL 
           value: "resnet" 

@@ -14,7 +14,7 @@
       "models": [
         {
           "name": "resnet",
-          "num_indexes": 2,
+          "num_indexes": 1,
           "pods": 2
         }
       ]

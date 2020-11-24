@@ -2,11 +2,11 @@ FROM tensorflow/tensorflow
 
 WORKDIR /usr/app
 
-COPY requirements.txt requirements.txt
+COPY ./index/requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
-COPY index_server.py index_server.py
-COPY index.py index.py
+COPY ./index/index_server.py index_server.py
+COPY ./index/index.py index.py
 
 EXPOSE 9000
 

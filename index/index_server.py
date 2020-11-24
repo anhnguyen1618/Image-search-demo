@@ -5,7 +5,7 @@ from flask import Flask, request
 app = Flask(__name__)
 
 TOTAL_NUM_INDEXES = int(os.getenv('TOTAL_NUM_INDEXES', 1))
-CURRENT_INDEX = int(os.getenv('CURRENT_INDEX', 0))
+CURRENT_INDEX = int(os.getenv('CURRENT_INDEX', 1)) - 1
 ML_MODEL = os.getenv('ML_MODEL', "resnet")
 
 mongo_address = "mongos:27017"
