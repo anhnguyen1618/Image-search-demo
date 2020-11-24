@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: indexing-{model}-{index_num} 
-        image: zozonguyen/indexing:latest
+        image: zozonguyen1/indexing:latest
         imagePullPolicy: Always 
         ports:
         - containerPort: 5000

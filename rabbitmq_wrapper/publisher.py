@@ -6,7 +6,7 @@ class Publisher:
         self.exchange_name = "features"
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host_name)) # Connect to CloudAMQP
         self.channel = self.connection.channel() # start a channel
-        self.channel.exchange_declare(exchange=self.exchange_name, type="fanout")
+        self.channel.exchange_declare(exchange=self.exchange_name, exchange_type="fanout")
     
     def close(self):
         self.connection.close()

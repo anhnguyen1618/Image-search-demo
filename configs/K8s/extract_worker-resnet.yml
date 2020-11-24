@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: extract-worker-resnet
-        image: zozonguyen/extract_worker:latest
+        image: zozonguyen1/extract_worker:latest
         imagePullPolicy: Always 
         ports:
         - containerPort: 5000

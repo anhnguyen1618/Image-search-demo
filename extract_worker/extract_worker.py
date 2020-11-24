@@ -43,6 +43,10 @@ class Worker:
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host_name)) 
         self.channel = self.connection.channel() 
         self.channel.queue_declare(queue=queue_name)
+        self.channel_name = "features"
+        self.channel.exchange_declare(exchange=self.channel_name, exchange_type="fanout")
+        self.channel.queue_bind(exchange=self.channel_name,
+                   queue=queue_name)
         self.channel.basic_qos(prefetch_count = 20)
         # set up subscription on the queue
         self.channel.basic_consume(queue_name, self.process)

@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: serving 
-        image: zozonguyen/serving:latest
+        image: zozonguyen1/serving:latest
         imagePullPolicy: Always 
         ports:
         - containerPort: 5000

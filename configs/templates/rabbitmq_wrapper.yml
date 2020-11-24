@@ -29,6 +29,6 @@ spec:
       containers:
       - name: rabbitmq-wrapper 
         image: zozonguyen1/rabbitmq_wrapper:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always 
         ports:
         - containerPort: 5000

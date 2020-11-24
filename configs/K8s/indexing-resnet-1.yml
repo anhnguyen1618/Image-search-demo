@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: indexing-resnet-1 
-        image: zozonguyen/indexing:latest
+        image: zozonguyen1/indexing:latest
         imagePullPolicy: Always 
         ports:
         - containerPort: 5000

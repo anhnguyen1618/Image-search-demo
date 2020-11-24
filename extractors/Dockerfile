@@ -1,12 +1,12 @@
 FROM tensorflow/tensorflow 
 WORKDIR /usr/app
-COPY ./requirements.txt ./ 
+COPY ./extractors/requirements.txt ./ 
 
 RUN pip install -r requirements.txt
 
-COPY extractor_server.py extractor_server.py
-COPY extractors.py extractors.py
-COPY ./templates/index.html ./templates/index.html
+COPY ./extractors/extractor_server.py extractor_server.py
+COPY ./extractors/extractors.py extractors.py
+COPY ./extractors/templates/index.html ./templates/index.html
 RUN mkdir files
 
 EXPOSE 5000

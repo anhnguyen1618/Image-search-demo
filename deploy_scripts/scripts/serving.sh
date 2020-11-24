@@ -1,6 +1,6 @@
 #!/bin/bash
-# docker tag 1aaf554283a7 zozonguyen/serving:v1
-# docker push zozonguyen/serving
+# docker tag 1aaf554283a7 zozonguyen1/serving:v1
+# docker push zozonguyen1/serving
 oc apply -f ../K8s/rabbitmq.yml
 oc apply -f ../K8s/rabbitmq_wrapper.yml
 oc apply -f ../K8s/mongo.yml
