@@ -11,8 +11,8 @@ ML_MODEL = os.getenv('ML_MODEL', "resnet")
 FILE_UPLOAD_DIR = os.getcwd() + "/files"
 INDEX_URL = f"http://indexing-{ML_MODEL}"
 PORT=5000
-model_name = 'resnet'
-model = model_picker(model_name)
+
+model = model_picker(ML_MODEL)
 
 app = Flask(__name__, static_url_path = FILE_UPLOAD_DIR)
 

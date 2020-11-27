@@ -15,7 +15,9 @@ class Index:
         # self.records = list(self.db[model_name].find({}))
         features = list(map(lambda x: x["feature"], self.records))
         urls = list(map(lambda x: x["url"], self.records))
-        print("length ", len(urls))
+        print(f"Indexing {len(urls)} records using {model_name}")
+
+
         if len(self.records):
             self.neighbors = NearestNeighbors(
                 n_neighbors=min(n_neighbors, len(self.records)),

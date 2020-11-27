@@ -9,13 +9,13 @@ services:
         ports:
             - "5000:5000"
         environment:
-            - TOTAL_NUM_INDEXES=2
-            - ML_MODEL="resnet"
+            - TOTAL_NUM_INDEXES=1
+            - ML_MODEL=inception
         volumes:
             - ./extractors:/usr/app
 
-    indexing-1:
-        container_name: indexing-1
+    indexing-inception-1:
+        container_name: indexing-inception-1 
         image: indexing
         build: 
             context: ./ 
@@ -23,30 +23,30 @@ services:
         ports:
             - "9000:5000"
         environment:
-            - TOTAL_NUM_INDEXES=2
-            - CURRENT_INDEX=0
-            - ML_MODEL="resnet"
+            - TOTAL_NUM_INDEXES=1
+            - CURRENT_INDEX=1
+            - ML_MODEL=inception
         volumes:
             - ./index:/usr/app
         depends_on: 
             - mongos
 
-    indexing-2:
-        container_name: indexing-2
-        image: indexing
-        build: 
-            context: ./ 
-            dockerfile: index/Dockerfile  
-        ports:
-            - "9001:5000"
-        environment:
-            - TOTAL_NUM_INDEXES=2
-            - CURRENT_INDEX=1
-            - ML_MODEL="resnet"
-        volumes:
-            - ./index:/usr/app
-        depends_on: 
-            - mongos
+    # indexing-2:
+    #     container_name: indexing-2
+    #     image: indexing
+    #     build: 
+    #         context: ./ 
+    #         dockerfile: index/Dockerfile  
+    #     ports:
+    #         - "9001:5000"
+    #     environment:
+    #         - TOTAL_NUM_INDEXES=2
+    #         - CURRENT_INDEX=1
+    #         - ML_MODEL="resnet"
+    #     volumes:
+    #         - ./index:/usr/app
+    #     depends_on: 
+    #         - mongos
 
     extract_worker:
         container_name: extract_worker
@@ -54,6 +54,8 @@ services:
             context: ./ 
             dockerfile: extract_worker/Dockerfile
         image: extract_worker 
+        environment:
+            - ML_MODEL=inception
         depends_on: 
             - rabbitmq
 

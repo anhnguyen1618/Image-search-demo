@@ -29,8 +29,9 @@ class Worker:
         
         self.bucket_handler = Bucket(bucket_name)
 
+        print(f"Extract worker for model: {queue_name}")
         # change model later
-        self.model = model_picker('resnet')
+        self.model = model_picker(queue_name)
 
         # set up db
         client = MongoClient(mongo_address)
@@ -67,7 +68,8 @@ class Worker:
 
 
 if __name__ == '__main__':
-    algorithm = "resnet"
+    ML_MODEL = os.getenv('ML_MODEL', "resnet")
+    algorithm = ML_MODEL 
     bucket_name = "images-search"
     # mongo_address = "mongo_test:27017" 
     mongo_address = "mongos:27017" 
