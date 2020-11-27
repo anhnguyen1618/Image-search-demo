@@ -19,8 +19,10 @@ def hello():
 
 @app.route("/reindex")
 def reindex():
+    global index
     index = Index(mongo_address, model_name, TOTAL_NUM_INDEXES, CURRENT_INDEX)
-    return f"Done indexing {len(index.records)}"
+    msg = f"Done indexing {len(index.records)}"
+    return msg 
 
 @app.route("/search", methods=["POST"])
 def search():

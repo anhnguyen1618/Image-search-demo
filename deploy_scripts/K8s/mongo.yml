@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: mongos 
-        image: mongo:4.2.0
+        image: eu.gcr.io/gothic-module-289816/mongo:latest 
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 27017

@@ -44,7 +44,7 @@ spec:
     spec:
       containers:
       - name: serving-resnet 
-        image: zozonguyen/serving:latest
+        image: eu.gcr.io/gothic-module-289816/serving:latest  
         imagePullPolicy: IfNotPresent 
         ports:
         - containerPort: 5000
@@ -53,7 +53,7 @@ spec:
             path: /
             port: 5000 
           initialDelaySeconds: 5
-          periodSeconds: 60 
+          periodSeconds: 10 
         volumeMounts:
           - name: myclaim 
             mountPath: /usr/app/files

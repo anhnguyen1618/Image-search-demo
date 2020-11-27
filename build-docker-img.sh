@@ -1,12 +1,13 @@
 #!/bin/bash
-docker build -t zozonguyen1/indexing:latest . -f ./index/Dockerfile
-docker push zozonguyen1/indexing
+gcloud auth configure-docker
+docker build -t eu.gcr.io/gothic-module-289816/indexing:latest . -f ./index/Dockerfile
+docker push eu.gcr.io/gothic-module-289816/indexing:latest 
 
-docker build -t zozonguyen1/serving:latest . -f ./extractors/Dockerfile
-docker push zozonguyen1/serving
+docker build -t eu.gcr.io/gothic-module-289816/serving:latest . -f ./extractors/Dockerfile
+docker push eu.gcr.io/gothic-module-289816/serving:latest
 
-docker build -t zozonguyen1/extract_worker:latest . -f ./extract_worker/Dockerfile
-docker push zozonguyen1/extract_worker
+docker build -t eu.gcr.io/gothic-module-289816/extract_worker:latest . -f ./extract_worker/Dockerfile
+docker push eu.gcr.io/gothic-module-289816/extract_worker:latest/extract_worker
 
-docker build -t zozonguyen1/rabbitmq_wrapper:latest . -f ./rabbitmq_wrapper/Dockerfile
-docker push zozonguyen1/rabbitmq_wrapper
+docker build -t eu.gcr.io/gothic-module-289816/rabbitmq_wrapper:latest . -f ./rabbitmq_wrapper/Dockerfile
+docker push eu.gcr.io/gothic-module-289816/extract_worker:latest/rabbitmq_wrapper

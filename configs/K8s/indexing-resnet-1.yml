@@ -30,10 +30,11 @@ spec:
     metadata:
       labels:
         app: indexing-resnet-1 
+        service: indexing
     spec:
       containers:
       - name: indexing-resnet-1 
-        image: zozonguyen/indexing:latest
+        image: eu.gcr.io/gothic-module-289816/indexing:latest 
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000

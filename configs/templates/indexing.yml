@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: indexing-{model}-{index_num} 
-        image: zozonguyen/indexing:latest
+        image: eu.gcr.io/gothic-module-289816/indexing:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
