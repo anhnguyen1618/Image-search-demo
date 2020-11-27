@@ -120,7 +120,7 @@ def clean_and_apply():
             execute(f"oc delete -f {main_dir}/{cur_file}")
 
     os.chdir("..")
-    execute("./build-docker-img.sh")
+    # execute("./build-docker-img.sh")
     os.chdir("configs")
     execute(f"rm -r {main_dir} && mv {stage_dir} {main_dir} && mkdir {stage_dir}  && oc apply -f {main_dir}")
 

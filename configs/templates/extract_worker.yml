@@ -1,5 +1,16 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
 apiVersion: apps/v1 
-kind: StatefulSet 
+kind: Deployment 
 metadata:
   name: extract-worker-{model}
 spec:
@@ -14,22 +25,17 @@ spec:
     spec:
       containers:
       - name: extract-worker-{model}
-        image: zozonguyen1/extract_worker:latest
-        imagePullPolicy: Always 
+        image: zozonguyen/extract_worker:latest
+        imagePullPolicy: IfNotPresent 
         ports:
         - containerPort: 5000
         volumeMounts:
-          - name: file-claim
+          - name: myclaim 
             mountPath: /usr/app/tmp
         env:
         - name: ML_MODEL 
           value: "{model}"
-
-  volumeClaimTemplates:
-  - metadata:
-      name: file-claim
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 100Mi
+      volumes:
+        - name: myclaim 
+          persistentVolumeClaim:
+            claimName: myclaim

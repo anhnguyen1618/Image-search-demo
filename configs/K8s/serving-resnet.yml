@@ -12,12 +12,28 @@ spec:
   type: LoadBalancer
 
 ---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
 apiVersion: apps/v1 
-kind: StatefulSet 
+kind: Deployment 
 metadata:
   name: serving-resnet
 spec:
   replicas: 1 
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 100%
   selector:
     matchLabels:
       app: serving-resnet 
@@ -28,24 +44,25 @@ spec:
     spec:
       containers:
       - name: serving-resnet 
-        image: zozonguyen1/serving:latest
-        imagePullPolicy: Always 
+        image: zozonguyen/serving:latest
+        imagePullPolicy: IfNotPresent 
         ports:
         - containerPort: 5000
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000 
+          initialDelaySeconds: 5
+          periodSeconds: 60 
         volumeMounts:
-          - name: file-claim
+          - name: myclaim 
             mountPath: /usr/app/files
         env:
         - name: TOTAL_NUM_INDEXES 
           value: "1"
         - name: ML_MODEL 
           value: "resnet"
-
-  volumeClaimTemplates:
-  - metadata:
-      name: file-claim
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 100Mi
+      volumes:
+        - name: myclaim 
+          persistentVolumeClaim:
+            claimName: myclaim 
