@@ -102,6 +102,120 @@ class Rabbitmq(Common_generator):
         file.write(content) 
         file.close()
 
+
+
+class Mongo(Common_generator):
+    class Config_db(Common_generator):
+        def gen_yml(self):
+            template_file = open(f"{self.template_dir}/mongo_config_db.yml")
+            content = template_file.read().replace("{num_pods}", str(self.data["pods"]))
+            file = open(f"{self.out_dir}/mongo_config_db.yml", "w") 
+            file.write(content) 
+            file.close()
+        
+        def gen_script(self):
+            template_file = open(f"{self.template_dir}/mongo_config_db.sh")
+            num_pods = self.data["pods"]
+            condition_result = " ".join(["True" for i in range(num_pods)])
+            content = (
+                template_file.read()
+                    .replace("{condition_result}", condition_result)
+                    .replace("{data_replicates}", self.gen_members(num_pods))
+            )
+            file = open(f"{self.out_dir}/mongo_config_db.sh", "w") 
+            file.write(content) 
+            file.close()
+        
+        def gen_members(self, num_pods):
+            def get_url(index):
+                return f"\\\"configdb-{index}.configdb.mongo.svc.cluster.local:27017\\\""
+            return ", ".join(["{" + f"_id : {index}, host : {get_url(index)}" + "}" for index in range(num_pods)])
+
+        def gen(self, extra_data = None):
+            self.gen_yml()
+            self.gen_script()
+
+    class Router(Common_generator):
+        def gen_config_urls_string(self, services):
+            for service in services:
+                if service["name"] == "config_db":
+                    num_config_dbs = service["pods"]
+                    return ", ".join([f"configdb-{i}.configdb.mongo.svc.cluster.local:27017" for i in range(num_config_dbs)])
+            return "" 
+
+        def gen(self, services = None):
+            template_file = open(f"{self.template_dir}/mongo_router.yml")
+            config_urls_string = self.gen_config_urls_string(services)
+            content = template_file.read().replace("{num_pods}", str(self.data["pods"])).replace("{config_urls}", config_urls_string)
+            file = open(f"{self.out_dir}/mongo_router.yml", "w") 
+            file.write(content) 
+            file.close()
+
+    class Shard(Common_generator):
+        def gen_yml(self):
+            template_file = open(f"{self.template_dir}/mongo_shard.yml")
+            template_content = template_file.read()
+            num_pods_per_shard = self.data["pods"]
+            num_shards = self.data["shards"]
+            for index in range(num_shards):
+                content = template_content.replace("{index}", str(index)).replace("{num_pods}", str(self.data["pods"]))
+                file = open(f"{self.out_dir}/mongo_shard_{index}.yml", "w") 
+                file.write(content) 
+
+        def gen_members(self, num_pods):
+            def get_url(index):
+                return f"\\\"mongodb-shard$shards-{index}.mongodb-shard$shards.mongo.svc.cluster.local:27017\\\""
+
+            return ", ".join(["{" + f"_id : {index}, host : {get_url(index)}" + "}" for index in range(num_pods)])
+        
+        def gen_shard_cmds_string(self):
+            model_names = [
+                'vgg16',
+                'vgg19',
+                'mobilenet',
+                'inception',
+                'resnet',
+                'xception'
+            ]
+
+            return "; ".join([f"sh.shardCollection('features.{model_name}', " + "{_id: \\\"hashed\\\"})" for model_name in model_names])
+
+        def gen_script(self):
+            template_file = open(f"{self.template_dir}/mongo_shard.sh")
+            num_pods = self.data["pods"]
+            num_shards = self.data["shards"]
+            condition_result = " ".join(["True" for i in range(num_pods)])
+
+            content = (
+                template_file.read()
+                    .replace("{num_shards}", str(num_shards))
+                    .replace("{condition_result}", condition_result)
+                    .replace("{shard_db_cmds}", self.gen_shard_cmds_string())
+                    .replace("{data_replicates}", self.gen_members(num_pods))
+            )
+            file = open(f"{self.out_dir}/mongo_shard.sh", "w") 
+            file.write(content) 
+            file.close()
+
+
+        def gen(self, extra_data = None):
+            self.gen_yml()
+            self.gen_script()
+
+    def __init__(self, data):
+        super().__init__(data)
+        self.sub_services = data["services"]
+        self.generator_mappings = {
+            "config_db": self.Config_db,
+            "router": self.Router,
+            "shard": self.Shard
+        }
+
+    def gen(self, extra_data = None):
+        for sub_service in self.sub_services:
+            generator = self.generator_mappings.get(sub_service["name"], Common_generator)(sub_service)
+            generator.gen(self.sub_services)
+
 class Generator:
     def __init__(self, path):
         file = open(path)
@@ -111,7 +225,8 @@ class Generator:
             "indexing": Indexing,
             "serving": Serving,
             "rabbitmq_wrapper": Rabbitmq_wrapper,
-            "rabbitmq": Rabbitmq
+            "rabbitmq": Rabbitmq,
+            "mongo": Mongo
         }
 
     def gen_service(self):

@@ -48,6 +48,24 @@
     {
       "name": "rabbitmq",
       "pods": 2
+    },
+    {
+      "name": "mongo",
+      "services": [
+        {
+          "name": "config_db",
+          "pods": 3
+        },
+        {
+          "name": "router",
+          "pods": 3
+        },
+        {
+          "name": "shard",
+          "shards": 2,
+          "pods": 3
+        }
+      ]
     }
   ]
 }

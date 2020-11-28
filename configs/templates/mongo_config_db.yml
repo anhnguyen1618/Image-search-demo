@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: configdb
+  labels:
+    name: configdb
+spec:
+  serviceName: "configdb"
+  replicas: {num_pods} 
+  selector:
+    matchLabels:
+      name: configdb
+  template:
+    metadata:
+      labels:
+        name: configdb
+    spec:
+      containers:
+      - name: mongodb-configdb-container
+        image: mongo:3.6.6
+        command:
+        - "mongod"
+        - "--replSet"
+        - "cfgrs"
+        - "--port"
+        - "27017"
+        - "--dbpath"
+        - "/mongo-disk"
+        - "--bind_ip"
+        - "0.0.0.0"
+        - "--configsvr"
+        ports:
+        - containerPort: 27017              	
+        volumeMounts:
+        - name: mongodb-configdb-claim
+          mountPath: /mongo-disk
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-configdb-claim
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 100Mi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: configdb
+  labels:
+    name: configdb
+spec:
+  clusterIP: None
+  ports:
+  - port: 27017
+    protocol: TCP
+  selector:
+    name: configdb

@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-shard{index}
+  labels:
+    appdb: mongodb-shard{index}
+    role: shard
+spec:
+  serviceName: "mongodb-shard{index}"
+  replicas: 3
+  selector:
+    matchLabels:
+      appdb: mongodb-shard{index}
+  template:
+    metadata:
+      labels:
+        appdb: mongodb-shard{index}
+    spec:
+      containers:
+      - name: mongodb-shard{index}
+        image: mongo:3.6.6
+        command:
+        - "mongod"
+        - "--bind_ip"
+        - "0.0.0.0"
+        - "--shardsvr"
+        - "--replSet"
+        - "shard{index}"
+        - "--port"
+        - "27017"
+        - "--dbpath"
+        - "/data/db"
+        ports:
+        - containerPort: 27017              	
+        volumeMounts:
+        - name: mongodb-shard{index}-pv-claim
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-shard{index}-pv-claim
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 2Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-shard{index}
+  labels:
+    app: mongodb-shard{index}
+spec:
+  clusterIP: None
+  ports:
+  - port: 27017
+    protocol: TCP
+  selector:
+    appdb: mongodb-shard{index}
