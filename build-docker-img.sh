@@ -7,7 +7,7 @@ docker build -t eu.gcr.io/gothic-module-289816/serving:latest . -f ./extractors/
 docker push eu.gcr.io/gothic-module-289816/serving:latest
 
 docker build -t eu.gcr.io/gothic-module-289816/extract_worker:latest . -f ./extract_worker/Dockerfile
-docker push eu.gcr.io/gothic-module-289816/extract_worker:latest/extract_worker
+docker push eu.gcr.io/gothic-module-289816/extract_worker:latest
 
 docker build -t eu.gcr.io/gothic-module-289816/rabbitmq_wrapper:latest . -f ./rabbitmq_wrapper/Dockerfile
-docker push eu.gcr.io/gothic-module-289816/extract_worker:latest/rabbitmq_wrapper
+docker push eu.gcr.io/gothic-module-289816/rabbitmq_wrapper:latest

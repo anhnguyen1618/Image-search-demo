@@ -47,7 +47,6 @@ class Indexing(Common_generator):
     def gen(self, extra_data = None):
         print(self.data)
         for model in self.data["models"]:
-            print("model")
             self.gen_from_template(model["name"], model["num_indexes"], model["pods"])
         pass
 
@@ -86,7 +85,22 @@ class Serving(Common_generator):
                 continue
             
             self.gen_from_template(model_name, num_indexes)
-    
+
+class Rabbitmq_wrapper(Common_generator):
+    def gen(self, extra_data = None):
+        template_file = open(f"{self.template_dir}/rabbitmq_wrapper.yml")
+        content = template_file.read().replace("{num_pods}", str(self.data["pods"]))
+        file = open(f"{self.out_dir}/rabbitmq_wrapper.yml", "w") 
+        file.write(content) 
+        file.close()
+
+class Rabbitmq(Common_generator):
+    def gen(self, extra_data = None):
+        template_file = open(f"{self.template_dir}/rabbitmq.yml")
+        content = template_file.read().replace("{num_pods}", str(self.data["pods"]))
+        file = open(f"{self.out_dir}/rabbitmq.yml", "w") 
+        file.write(content) 
+        file.close()
 
 class Generator:
     def __init__(self, path):
@@ -95,7 +109,9 @@ class Generator:
         self.generator_mappings = {
             "extract_worker": Extract_worker,
             "indexing": Indexing,
-            "serving": Serving
+            "serving": Serving,
+            "rabbitmq_wrapper": Rabbitmq_wrapper,
+            "rabbitmq": Rabbitmq
         }
 
     def gen_service(self):

@@ -30,6 +30,7 @@ spec:
     metadata:
       labels:
         app: indexing-{model}-{index_num} 
+        service: indexing
     spec:
       containers:
       - name: indexing-{model}-{index_num} 

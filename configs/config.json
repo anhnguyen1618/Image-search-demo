@@ -5,7 +5,11 @@
       "models": [
         {
           "name": "resnet",
-          "pods": 2
+          "pods": 2 
+        },
+        {
+          "name": "mobilenet",
+          "pods": 2 
         }
       ]
     },
@@ -14,6 +18,11 @@
       "models": [
         {
           "name": "resnet",
+          "num_indexes": 1,
+          "pods": 2
+        },
+        {
+          "name": "mobilenet",
           "num_indexes": 1,
           "pods": 2
         }
@@ -25,8 +34,20 @@
         {
           "name": "resnet",
           "pods": 1
+        },
+        {
+          "name": "mobilenet",
+          "pods": 1
         }
       ] 
+    },
+    {
+      "name": "rabbitmq_wrapper",
+      "pods": 1
+    },
+    {
+      "name": "rabbitmq",
+      "pods": 2
     }
   ]
 }

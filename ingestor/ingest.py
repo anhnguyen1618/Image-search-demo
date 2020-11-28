@@ -25,11 +25,14 @@ class Ingestor:
         file_names = self.read_dir(dir_path)
         for file_name in file_names:
             bucket_file_name = self.bucket.upload(file_name)
-            requests.post(self.rabbitmq_url,
+            x = requests.post(self.rabbitmq_url,
                           json={
                               "url": bucket_file_name,
                               "queue_name": self.queue_name
                           })
+            if x.status_code != 200:
+                print(x.status_code)
+                print(f"Request fails for image: {bucket_file_name}")
 
         print(
             f"Done with uploading {len(file_names)} images to bucket {self.bucket_name}"

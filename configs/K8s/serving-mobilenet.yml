@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: serving-resnet 
+  name: serving-mobilenet 
 spec:
   selector:
-    app: serving-resnet
+    app: serving-mobilenet
   ports:
   - protocol: "TCP"
     port: 5000
@@ -26,7 +26,7 @@ spec:
 apiVersion: apps/v1 
 kind: Deployment 
 metadata:
-  name: serving-resnet
+  name: serving-mobilenet
 spec:
   replicas: 1 
   strategy:
@@ -36,14 +36,14 @@ spec:
       maxSurge: 100%
   selector:
     matchLabels:
-      app: serving-resnet 
+      app: serving-mobilenet 
   template:
     metadata:
       labels:
-        app: serving-resnet 
+        app: serving-mobilenet 
     spec:
       containers:
-      - name: serving-resnet 
+      - name: serving-mobilenet 
         image: eu.gcr.io/gothic-module-289816/serving:latest 
         imagePullPolicy: IfNotPresent 
         ports:
@@ -61,7 +61,7 @@ spec:
         - name: TOTAL_NUM_INDEXES 
           value: "1"
         - name: ML_MODEL 
-          value: "resnet"
+          value: "mobilenet"
       volumes:
         - name: myclaim 
           persistentVolumeClaim:

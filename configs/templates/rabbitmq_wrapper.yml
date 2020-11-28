@@ -13,11 +13,11 @@ spec:
 
 ---
 apiVersion: apps/v1 
-kind: StatefulSet 
+kind: Deployment 
 metadata:
   name: rabbitmq-wrapper 
 spec:
-  replicas: 1 
+  replicas: {num_pods} 
   selector:
     matchLabels:
       app: rabbitmq-wrapper 
@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: rabbitmq-wrapper 
-        image: zozonguyen1/rabbitmq_wrapper:latest
-        imagePullPolicy: Always 
+        image: eu.gcr.io/gothic-module-289816/rabbitmq_wrapper:latest 
+        imagePullPolicy: IfNotPresent 
         ports:
         - containerPort: 5000

@@ -41,7 +41,8 @@ class Worker:
         self.connection.close()   
     
     def set_up_rabbitmq_connection(self, host_name, queue_name):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host_name)) 
+        credentials = pika.PlainCredentials('admin', 'admin')
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host_name, credentials=credentials)) 
         self.channel = self.connection.channel() 
         self.channel.queue_declare(queue=queue_name)
         self.channel_name = "features"

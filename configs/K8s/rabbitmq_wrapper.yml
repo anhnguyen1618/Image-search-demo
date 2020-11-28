@@ -13,7 +13,7 @@ spec:
 
 ---
 apiVersion: apps/v1 
-kind: StatefulSet 
+kind: Deployment 
 metadata:
   name: rabbitmq-wrapper 
 spec:
@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: rabbitmq-wrapper 
-        image: zozonguyen/rabbitmq_wrapper:latest
-        imagePullPolicy: IfNotPresent
+        image: eu.gcr.io/gothic-module-289816/rabbitmq_wrapper:latest 
+        imagePullPolicy: IfNotPresent 
         ports:
         - containerPort: 5000

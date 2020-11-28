@@ -25,8 +25,8 @@ spec:
     spec:
       containers:
       - name: extract-worker-resnet
-        image: zozonguyen/extract_worker:latest
-        imagePullPolicy: IfNotPresent 
+        image: eu.gcr.io/gothic-module-289816/extract_worker 
+        imagePullPolicy: Always 
         ports:
         - containerPort: 5000
         volumeMounts:
