@@ -139,6 +139,7 @@ def clean_and_apply():
     # execute("./build-docker-img.sh")
     os.chdir("configs")
     execute(f"rm -r {main_dir} && mv {stage_dir} {main_dir} && mkdir {stage_dir}  && oc apply -f {main_dir}")
+    execute("sh expose.sh")
 
 if __name__ == '__main__':
     if not os.path.exists(stage_dir):
