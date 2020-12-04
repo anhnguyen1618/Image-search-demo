@@ -11,6 +11,7 @@ services:
         environment:
             - TOTAL_NUM_INDEXES=1
             - ML_MODEL=inception
+            - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
         volumes:
             - ./extractors:/usr/app
 
@@ -26,6 +27,8 @@ services:
             - TOTAL_NUM_INDEXES=1
             - CURRENT_INDEX=1
             - ML_MODEL=inception
+            - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
+            - INDEX_ALGORITHM=kd_tree
         volumes:
             - ./index:/usr/app
         depends_on: 
@@ -56,6 +59,7 @@ services:
         image: extract_worker 
         environment:
             - ML_MODEL=inception
+            - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
         depends_on: 
             - rabbitmq
 
@@ -63,7 +67,10 @@ services:
         image: "rabbitmq:3-management"
         ports:
         - "7672:5672"
-        - "7000:15672"
+        - "7000:15672"       
+        environment:
+            - RABBITMQ_DEFAULT_USER=admin
+            - RABBITMQ_DEFAULT_PASS=admin
         volumes:
         - './rabbitmq_data:/data'
     
@@ -73,6 +80,7 @@ services:
         build: 
             context: ./ 
             dockerfile: rabbitmq_wrapper/Dockerfile 
+
         ports:
             - "8000:5000"
 

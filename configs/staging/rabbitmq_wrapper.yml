@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-wrapper 
+  labels:
+    type: public
+spec:
+  selector:
+    app: rabbitmq-wrapper 
+  ports:
+  - protocol: "TCP"
+    port: 5000
+    targetPort: 5000
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1 
+kind: Deployment 
+metadata:
+  name: rabbitmq-wrapper 
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: rabbitmq-wrapper 
+  template:
+    metadata:
+      labels:
+        app: rabbitmq-wrapper 
+    spec:
+      containers:
+      - name: rabbitmq-wrapper 
+        image: eu.gcr.io/gothic-module-289816/rabbitmq_wrapper:latest 
+        imagePullPolicy: IfNotPresent 
+        ports:
+        - containerPort: 5000

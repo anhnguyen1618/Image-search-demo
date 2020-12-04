@@ -7,11 +7,12 @@ app = Flask(__name__)
 TOTAL_NUM_INDEXES = int(os.getenv('TOTAL_NUM_INDEXES', 1))
 CURRENT_INDEX = int(os.getenv('CURRENT_INDEX', 1)) - 1
 ML_MODEL = os.getenv('ML_MODEL', "resnet")
+index_algorithm = os.getenv('INDEX_ALGORITHM', "brute")
 
 mongo_address = "mongos:27017"
 # mongo_address = "127.0.0.1:1048"
 model_name = ML_MODEL 
-index = Index(mongo_address, model_name, TOTAL_NUM_INDEXES, CURRENT_INDEX)
+index = Index(mongo_address, model_name, TOTAL_NUM_INDEXES, CURRENT_INDEX, algorithm=index_algorithm)
 
 @app.route("/")
 def hello():

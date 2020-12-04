@@ -15,7 +15,7 @@ class Index:
         # self.records = list(self.db[model_name].find({}))
         features = list(map(lambda x: x["feature"], self.records))
         urls = list(map(lambda x: x["url"], self.records))
-        print(f"Indexing {len(urls)} records using {model_name}")
+        print(f"Indexing {len(urls)} records for model {model_name} using algorithm {algorithm}")
 
 
         if len(self.records):

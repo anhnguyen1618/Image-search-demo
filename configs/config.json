@@ -10,6 +10,12 @@
         {
           "name": "mobilenet",
           "pods": 2 
+        },
+        {
+          "name": "custom",
+          "num_indexes": 1,
+          "pods": 1,
+          "model_url": "https://storage.googleapis.com/images-search/model-finetuned.h5"
         }
       ]
     },
@@ -25,6 +31,12 @@
           "name": "mobilenet",
           "num_indexes": 1,
           "pods": 2
+        },
+        {
+          "name": "custom",
+          "num_indexes": 1,
+          "pods": 1,
+          "model_url": "https://storage.googleapis.com/images-search/model-finetuned.h5"
         }
       ]
     },
@@ -33,11 +45,18 @@
       "models": [
         {
           "name": "resnet",
-          "pods": 1
+          "pods": 1,
+          "index_algorithm": "kd_tree"
         },
         {
           "name": "mobilenet",
           "pods": 1
+        },
+        {
+          "name": "custom",
+          "num_indexes": 1,
+          "pods": 1,
+          "model_url": "https://storage.googleapis.com/images-search/model-finetuned.h5"
         }
       ] 
     },

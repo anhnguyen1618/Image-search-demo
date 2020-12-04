@@ -6,6 +6,7 @@ import random
 import time
 import math
 import tensorflow
+import requests
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input
@@ -13,11 +14,32 @@ from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.applications.vgg19 import VGG19
 from tensorflow.keras.applications.mobilenet import MobileNet
 from tensorflow.keras.applications.inception_v3 import InceptionV3
-from tensorflow.keras.models import Model
+from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.layers import Input, Flatten, Dense, Dropout, GlobalAveragePooling2D
 
+def download_model(model_url):
+    file_name = model_url.rsplit('/', 1)[1] if model_url.find('/') else ""
+    path_dir = f"./tmp/{file_name}"
+    if os.path.isfile(path_dir):
+        print(f"File already exist. Load file from {path_dir}")
+        return path_dir
 
-def model_picker(name):
+    print(f"Start downloading model at {model_url}")
+    r = requests.get(model_url, allow_redirects=True)
+    print(f"Writing model to dir {path_dir}")
+    open(path_dir, 'wb').write(r.content)
+    print("Done writing model!!!")
+    return path_dir
+
+def model_picker(name, model_url = ""):
+    if model_url:
+        if model_url[0] == "\"":
+            model_url = model_url[1:-1]
+        file_name = download_model(model_url)
+        if file_name:
+            model = load_model(file_name)
+            return model
+
     if (name == 'vgg16'):
         model = VGG16(weights='imagenet',
                       include_top=False,

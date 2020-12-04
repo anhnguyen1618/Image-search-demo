@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: indexing-{model}-{index_num} 
+  name: indexing-resnet-1 
 spec:
   selector:
-    app: indexing-{model}-{index_num} 
+    app: indexing-resnet-1 
   ports:
   - protocol: "TCP"
     port: 5000
@@ -15,9 +15,9 @@ spec:
 apiVersion: apps/v1 
 kind: Deployment 
 metadata:
-  name: indexing-{model}-{index_num} 
+  name: indexing-resnet-1 
 spec:
-  replicas: {num_pods}
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -25,27 +25,27 @@ spec:
       maxSurge: 100%
   selector:
     matchLabels:
-      app: indexing-{model}-{index_num} 
+      app: indexing-resnet-1 
   template:
     metadata:
       labels:
-        app: indexing-{model}-{index_num} 
+        app: indexing-resnet-1 
         service: indexing
     spec:
       containers:
-      - name: indexing-{model}-{index_num} 
+      - name: indexing-resnet-1 
         image: eu.gcr.io/gothic-module-289816/indexing:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
         env:
         - name: TOTAL_NUM_INDEXES 
-          value: "{num_indexes}"
+          value: "1"
         - name: CURRENT_INDEX 
-          value: "{index_num}"
+          value: "1"
         - name: ML_MODEL 
-          value: "{model}" 
+          value: "resnet" 
         - name: MODEL_URL 
-          value: "{model_url}" 
+          value: "" 
         - name: INDEX_ALGORITHM
-          value: "{index_algorithm}"
+          value: "brute"

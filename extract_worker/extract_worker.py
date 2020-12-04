@@ -10,6 +10,7 @@ from extractors import model_picker, extract_features
 class Worker:
     def __init__(self, params):
         queue_name = params["queue_name"]
+        model_url = params["model_url"]
         host_name = params.get("rabbitmq_hostname", "localhost")
         mongo_address = params.get("mongo_address", "localhost:27017")
         self.bucket_name = params["bucket_name"]
@@ -31,7 +32,7 @@ class Worker:
 
         print(f"Extract worker for model: {queue_name}")
         # change model later
-        self.model = model_picker(queue_name)
+        self.model = model_picker(queue_name, model_url)
 
         # set up db
         client = MongoClient(mongo_address)
@@ -71,8 +72,9 @@ class Worker:
 if __name__ == '__main__':
     ML_MODEL = os.getenv('ML_MODEL', "resnet")
     algorithm = ML_MODEL 
+    MODEL_URL = os.getenv("MODEL_URL", "")
     bucket_name = "images-search"
     # mongo_address = "mongo_test:27017" 
     mongo_address = "mongos:27017" 
     rabbitmq_hostname = "rabbitmq"
-    Worker({"queue_name": algorithm, "bucket_name": bucket_name, "mongo_address": mongo_address, "rabbitmq_hostname": rabbitmq_hostname})
+    Worker({"queue_name": algorithm, "model_url": MODEL_URL, "bucket_name": bucket_name, "mongo_address": mongo_address, "rabbitmq_hostname": rabbitmq_hostname})

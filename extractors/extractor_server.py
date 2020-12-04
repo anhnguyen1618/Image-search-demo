@@ -1,18 +1,19 @@
 from flask import Flask, abort, render_template, request
 import requests, asyncio
 import uuid, os, json
-from numpyencoder import NumpyEncoder
 from extractors import model_picker, extract_features
 
 TOTAL_NUM_INDEXES = int(os.getenv('TOTAL_NUM_INDEXES', 1))
 # TODO: use model to fetch correct service later
 ML_MODEL = os.getenv('ML_MODEL', "resnet")
 
-FILE_UPLOAD_DIR = os.getcwd() + "/files"
+FILE_UPLOAD_DIR = os.getcwd() + "/tmp"
 INDEX_URL = f"http://indexing-{ML_MODEL}"
 PORT=5000
 
-model = model_picker(ML_MODEL)
+# https://storage.googleapis.com/images-search/model-finetuned.h5
+MODEL_URL = os.getenv('MODEL_URL', "")
+model = model_picker(ML_MODEL, MODEL_URL)
 
 app = Flask(__name__, static_url_path = FILE_UPLOAD_DIR)
 
