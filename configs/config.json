@@ -1,4 +1,16 @@
 {
+  "models": [
+    {
+      "name": "resnet"
+    },
+    {
+      "name": "mobilenet"
+    },
+    {
+      "name": "custom",
+      "model_url": "https://storage.googleapis.com/images-search/model-finetuned.h5"
+    }
+  ],
   "services": [
     {
       "name": "extract_worker",
@@ -14,8 +26,7 @@
         {
           "name": "custom",
           "num_indexes": 1,
-          "pods": 1,
-          "model_url": "https://storage.googleapis.com/images-search/model-finetuned.h5"
+          "pods": 1
         }
       ]
     },
@@ -36,8 +47,7 @@
         {
           "name": "custom",
           "num_indexes": 1,
-          "pods": 1,
-          "model_url": "https://storage.googleapis.com/images-search/model-finetuned.h5"
+          "pods": 1
         }
       ]
     },
@@ -56,8 +66,7 @@
         {
           "name": "custom",
           "num_indexes": 1,
-          "pods": 1,
-          "model_url": "https://storage.googleapis.com/images-search/model-finetuned.h5"
+          "pods": 1
         }
       ] 
     },

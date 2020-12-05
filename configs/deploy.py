@@ -5,10 +5,11 @@ stage_dir = "./staging"
 main_dir = "./K8s"
 
 class Common_generator:
-    def __init__(self, data):
+    def __init__(self, data, model_meta = {}):
         self.data = data
         self.template_dir = "./templates"
         self.out_dir = stage_dir 
+        self.model_meta = model_meta
 
     def gen(self, extra_data = None):
         print(f"Service {self.data['name']} generator is missing")
@@ -28,8 +29,9 @@ class Extract_worker(Common_generator):
 
     def gen(self, extra_data = None):
         for model in self.data["models"]:
-            print(model)
-            self.gen_from_template(model["name"], model["pods"], model.get("model_url", ""))
+            model_name = model["name"]
+            model_url = self.model_meta.get(model_name, "")
+            self.gen_from_template(model_name, model["pods"], model_url)
 
 class Indexing(Common_generator):
     def gen_from_template(self, model_name, num_indexes, num_pods, index_algorithm = "brute", model_url = ""):
@@ -49,14 +51,15 @@ class Indexing(Common_generator):
             file.close() 
         
     def gen(self, extra_data = None):
-        print(self.data)
         for model in self.data["models"]:
-            self.gen_from_template(model["name"], model["num_indexes"], model["pods"], model.get("index_algorithm", "brute"), model.get("model_url", ""))
+            model_name = model["name"]
+            model_url = self.model_meta.get(model_name, "")
+            self.gen_from_template(model_name, model["num_indexes"], model["pods"], model.get("index_algorithm", "brute"), model_url)
         pass
 
 class Serving(Common_generator):
-    def __init__(self, data):
-        super().__init__(data)
+    def __init__(self, data, model_meta):
+        super().__init__(data, model_meta)
         self.models_data = data["models"]
     
     def get_indexes_info(self, index_data):
@@ -85,11 +88,12 @@ class Serving(Common_generator):
         for model in self.models_data:
             model_name = model["name"]
             num_indexes = indexes.get(model_name, 0)
+            model_url = self.model_meta.get(model_name, "")
             if num_indexes == 0:
                 print(f"ERROR: Could not found index service for model {model_name}")
                 continue
             
-            self.gen_from_template(model_name, num_indexes, model.get("model_url", ""))
+            self.gen_from_template(model_name, num_indexes, model_url)
 
 class Rabbitmq_wrapper(Common_generator):
     def gen(self, extra_data = None):
@@ -207,8 +211,8 @@ class Mongo(Common_generator):
             self.gen_yml()
             self.gen_script()
 
-    def __init__(self, data):
-        super().__init__(data)
+    def __init__(self, data, model_meta = {}):
+        super().__init__(data, model_meta)
         self.sub_services = data["services"]
         self.generator_mappings = {
             "config_db": self.Config_db,
@@ -233,6 +237,15 @@ class Generator:
             "rabbitmq": Rabbitmq,
             "mongo": Mongo
         }
+        self.model_meta = self.gen_model_meta(self.data.get("models", []))
+    
+    def gen_model_meta(self, models):
+        result = {}
+        for model in models:
+            name = model["name"]
+            model_url = model.get("model_url", "")
+            result[name] = model_url
+        return result
 
     def gen_service(self):
         services = self.data.get("services", [])
@@ -241,7 +254,7 @@ class Generator:
             generator.gen(self.data)
     
     def get_generator(self, data):
-        return self.generator_mappings.get(data["name"], Common_generator)(data)
+        return self.generator_mappings.get(data["name"], Common_generator)(data, self.model_meta)
 
 def execute(cmd):
     commands = cmd.split("&&")
@@ -270,4 +283,4 @@ if __name__ == '__main__':
 
     generator = Generator("config.json")
     generator.gen_service()
-    clean_and_apply()
+    # clean_and_apply()
