@@ -270,4 +270,4 @@ if __name__ == '__main__':
 
     generator = Generator("config.json")
     generator.gen_service()
-    # clean_and_apply()
+    clean_and_apply()

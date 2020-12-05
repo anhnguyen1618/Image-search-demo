@@ -35,7 +35,7 @@ spec:
       containers:
       - name: indexing-custom-1 
         image: eu.gcr.io/gothic-module-289816/indexing:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always 
         ports:
         - containerPort: 5000
         env:

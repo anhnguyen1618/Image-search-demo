@@ -17,7 +17,7 @@ kind: Deployment
 metadata:
   name: indexing-mobilenet-1 
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -35,7 +35,7 @@ spec:
       containers:
       - name: indexing-mobilenet-1 
         image: eu.gcr.io/gothic-module-289816/indexing:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always 
         ports:
         - containerPort: 5000
         env:

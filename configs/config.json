@@ -5,11 +5,11 @@
       "models": [
         {
           "name": "resnet",
-          "pods": 2 
+          "pods": 1 
         },
         {
           "name": "mobilenet",
-          "pods": 2 
+          "pods": 1 
         },
         {
           "name": "custom",
@@ -25,12 +25,13 @@
         {
           "name": "resnet",
           "num_indexes": 1,
-          "pods": 2
+          "pods": 1,
+          "index_algorithm": "kd_tree"
         },
         {
           "name": "mobilenet",
           "num_indexes": 1,
-          "pods": 2
+          "pods": 1 
         },
         {
           "name": "custom",
@@ -66,7 +67,7 @@
     },
     {
       "name": "rabbitmq",
-      "pods": 2
+      "pods": 1 
     },
     {
       "name": "mongo",

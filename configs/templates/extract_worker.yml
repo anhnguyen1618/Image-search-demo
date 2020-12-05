@@ -26,7 +26,7 @@ spec:
       containers:
       - name: extract-worker-{model}
         image: eu.gcr.io/gothic-module-289816/extract_worker 
-        imagePullPolicy: IfNotPresent 
+        imagePullPolicy: Always 
         ports:
         - containerPort: 5000
         volumeMounts:

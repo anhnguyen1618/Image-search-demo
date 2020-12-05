@@ -102,7 +102,7 @@ items:
       app: rabbitmq-cluster
     name: rabbitmq-cluster
   spec:
-    replicas: 2 
+    replicas: 1 
     selector:
       matchLabels:
         app: rabbitmq-cluster

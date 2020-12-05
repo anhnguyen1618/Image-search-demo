@@ -47,7 +47,7 @@ spec:
       containers:
       - name: serving-mobilenet 
         image: eu.gcr.io/gothic-module-289816/serving:latest 
-        imagePullPolicy: IfNotPresent 
+        imagePullPolicy: Always 
         ports:
         - containerPort: 5000
         readinessProbe:
