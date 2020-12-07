@@ -62,6 +62,8 @@ services:
             - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
         depends_on: 
             - rabbitmq
+        ports:
+            - "4000:5000"
 
     rabbitmq:
         image: "rabbitmq:3-management"
@@ -80,7 +82,8 @@ services:
         build: 
             context: ./ 
             dockerfile: rabbitmq_wrapper/Dockerfile 
-
+        volumes:
+            - ./rabbitmq_wrapper:/usr/app
         ports:
             - "8000:5000"
 

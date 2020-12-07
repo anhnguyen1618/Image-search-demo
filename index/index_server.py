@@ -1,6 +1,8 @@
 from index import Index
 import json, os
-from flask import Flask, request
+from flask import Flask, request, Response
+import prometheus_client
+from prometheus_client import start_http_server, Summary, Counter, Gauge
 
 app = Flask(__name__)
 
@@ -12,26 +14,47 @@ index_algorithm = os.getenv('INDEX_ALGORITHM', "brute")
 mongo_address = "mongos:27017"
 # mongo_address = "127.0.0.1:1048"
 model_name = ML_MODEL 
-index = Index(mongo_address, model_name, TOTAL_NUM_INDEXES, CURRENT_INDEX, algorithm=index_algorithm)
+index = None 
+
+
+class Observer:
+    def __init__(self):
+        self.request_time = Summary('processing_duration', 'Time spent indexing')
+        self.failure_count = Counter('num_of_exception', 'Number of exception')
+        self.index_gauge = Gauge("num_index_record", "Number of indexed records")
+        self.search_time = Summary("search_duration", "Time spent in searching")
+    def gen_report(self):
+        return [ prometheus_client.generate_latest(v) for v in [self.request_time, self.failure_count, self.index_gauge, self.search_time] ]
+
+observer = Observer()
 
 @app.route("/")
 def hello():
     return "tests"
 
 @app.route("/reindex")
+@observer.failure_count.count_exceptions()
+@observer.request_time.time()
 def reindex():
     global index
-    index = Index(mongo_address, model_name, TOTAL_NUM_INDEXES, CURRENT_INDEX)
+    index = Index(mongo_address, model_name, TOTAL_NUM_INDEXES, CURRENT_INDEX, algorithm = index_algorithm)
     msg = f"Done indexing {len(index.records)}"
+    observer.index_gauge.set(len(index.records))
     return msg 
 
 @app.route("/search", methods=["POST"])
+@observer.failure_count.count_exceptions()
+@observer.search_time.time()
 def search():
-    print("run into search")
     results = index.query(request.get_json())
     # results = index.query(index.test())
     # print("index results", results)
     return json.dumps(results)
 
+@app.route("/metrics")
+def metrics():
+    return Response(observer.gen_report(), mimetype="text/plain")
+
 if __name__ == "__main__":
+    reindex()
     app.run(host='0.0.0.0', port=5000, debug=True)

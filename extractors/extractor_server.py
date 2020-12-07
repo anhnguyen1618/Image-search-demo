@@ -1,7 +1,9 @@
-from flask import Flask, abort, render_template, request
+from flask import Flask, abort, render_template, request, Response
 import requests, asyncio
-import uuid, os, json
+import uuid, os, json, time
 from extractors import model_picker, extract_features
+import prometheus_client
+from prometheus_client import start_http_server, Summary, Counter
 
 TOTAL_NUM_INDEXES = int(os.getenv('TOTAL_NUM_INDEXES', 1))
 # TODO: use model to fetch correct service later
@@ -62,29 +64,46 @@ def search_from_index(payload, num_records=5):
     return res["results"][:num_records]
 
 
+class Observer:
+    def __init__(self):
+        self.request_time = Summary('processing_duration', 'Time spent indexing')
+        self.failure_count = Counter('num_of_exception', 'Number of exception')
+        self.search_time = Summary("search_duration", "Time spent in searching")
+
+    def gen_report(self):
+        return [ prometheus_client.generate_latest(v) for v in [self.request_time, self.failure_count, self.search_time] ]
+
+observer = Observer()
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
 
 @app.route("/search", methods=["POST"])
+@observer.failure_count.count_exceptions()
+@observer.request_time.time()
 def search():
     if request.files and request.files['record'] and allowed_file(request.files['record'].filename): 
         file = request.files['record']
         path = save_file(file)
         feature_vector = extract_features(path, model)
-
-        # payload = json.dumps(feature_vector, cls=NumpyEncoder)
         payload = feature_vector.tolist()
 
-        results = search_from_index(payload)
+        @observer.search_time.time()
+        def f():
+            return search_from_index(payload)
+
+        results = f()
+
         return render_template("index.html", results = results)
         # return res.content
     
     return "file format is not acceptable", 500
 
-
 @app.route("/changemodel/<new_model_name>")
 def changemodel(new_model_name):
+    global model
     new_model = model_picker(new_model_name) 
     if not new_model:
         abort(404)
@@ -96,6 +115,10 @@ def changemodel(new_model_name):
     print(msg)
 
     return msg
+
+@app.route("/metrics")
+def metrics():
+    return Response(observer.gen_report(), mimetype="text/plain")
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)

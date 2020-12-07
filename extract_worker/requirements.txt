@@ -2,3 +2,4 @@ pika
 pymongo
 google-cloud-storage
 pillow
+prometheus_client

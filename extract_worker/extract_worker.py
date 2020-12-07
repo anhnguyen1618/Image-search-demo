@@ -1,11 +1,15 @@
 import pika, sys, os
 from pymongo import MongoClient
 import time
+from prometheus_client import start_http_server, Summary, Counter
 
 sys.path.append(os.path.abspath('../bucket'))
 sys.path.append(os.path.abspath('../extractors'))
 from bucket import Bucket
 from extractors import model_picker, extract_features
+
+REQUEST_TIME = Summary('processing_duration', 'Time spent processing 1 image')
+FAILURE_COUNTER = Counter('number_of_exception', 'Number of exception')
 
 class Worker:
     def __init__(self, params):
@@ -57,7 +61,9 @@ class Worker:
     
     def get_public_url(self, file_name):
         return f"https://storage.googleapis.com/{self.bucket_name}/{file_name}" 
-    
+
+    @FAILURE_COUNTER.count_exceptions()
+    @REQUEST_TIME.time()
     def process(self, ch, method, properties, file_name):
         file_name = file_name.decode()
         print("file name", file_name)
@@ -77,4 +83,5 @@ if __name__ == '__main__':
     # mongo_address = "mongo_test:27017" 
     mongo_address = "mongos:27017" 
     rabbitmq_hostname = "rabbitmq"
+    start_http_server(5000)
     Worker({"queue_name": algorithm, "model_url": MODEL_URL, "bucket_name": bucket_name, "mongo_address": mongo_address, "rabbitmq_hostname": rabbitmq_hostname})
