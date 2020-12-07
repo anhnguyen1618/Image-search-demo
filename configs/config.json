@@ -35,18 +35,18 @@
       "models": [
         {
           "name": "resnet",
-          "num_indexes": 1,
+          "num_indexes": 2,
           "pods": 1,
           "index_algorithm": "kd_tree"
         },
         {
           "name": "mobilenet",
-          "num_indexes": 1,
+          "num_indexes": 2,
           "pods": 1 
         },
         {
           "name": "custom",
-          "num_indexes": 1,
+          "num_indexes": 2,
           "pods": 1
         }
       ]

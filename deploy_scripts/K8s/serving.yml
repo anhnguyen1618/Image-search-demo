@@ -29,7 +29,7 @@ spec:
       containers:
       - name: serving 
         image: zozonguyen1/serving:latest
-        imagePullPolicy: Always 
+        imagePullPolicy: IfNotPresent 
         ports:
         - containerPort: 5000
         volumeMounts:

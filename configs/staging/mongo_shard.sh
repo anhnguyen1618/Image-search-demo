@@ -33,6 +33,6 @@ do
   shards=$(($shards+1))
 done
 oc exec $(oc get pods -l name=mongos -o=jsonpath='{.items[0].metadata.name}')  -- mongo --eval "sh.enableSharding('features');"
-oc exec $(oc get pods -l name=mongos -o=jsonpath='{.items[0].metadata.name}')  -- mongo --eval "sh.shardCollection('features.vgg16', {_id: \"hashed\"}); sh.shardCollection('features.vgg19', {_id: \"hashed\"}); sh.shardCollection('features.mobilenet', {_id: \"hashed\"}); sh.shardCollection('features.inception', {_id: \"hashed\"}); sh.shardCollection('features.resnet', {_id: \"hashed\"}); sh.shardCollection('features.xception', {_id: \"hashed\"})"
+oc exec $(oc get pods -l name=mongos -o=jsonpath='{.items[0].metadata.name}')  -- mongo --eval "sh.shardCollection('features.vgg19', {_id: \"hashed\"}); sh.shardCollection('features.inception', {_id: \"hashed\"}); sh.shardCollection('features.vgg16', {_id: \"hashed\"}); sh.shardCollection('features.custom', {_id: \"hashed\"}); sh.shardCollection('features.xception', {_id: \"hashed\"}); sh.shardCollection('features.resnet', {_id: \"hashed\"}); sh.shardCollection('features.mobilenet', {_id: \"hashed\"})"
 # sh.shardCollection('features.{db_name}', {_id: \"hashed\"});
 echo "================== Succesfully config shard key! =================="

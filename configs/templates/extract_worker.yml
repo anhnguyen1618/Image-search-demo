@@ -35,7 +35,7 @@ spec:
         env:
         - name: ML_MODEL 
           value: "{model}"
-        - url: CUSTOM_MODEL_URL
+        - name: MODEL_URL
           value: "{model_url}"
       volumes:
         - name: myclaim 

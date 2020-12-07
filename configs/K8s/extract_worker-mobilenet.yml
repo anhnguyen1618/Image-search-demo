@@ -14,7 +14,7 @@ kind: Deployment
 metadata:
   name: extract-worker-mobilenet
 spec:
-  replicas: 2 
+  replicas: 1 
   selector:
     matchLabels:
       app: extract-worker-mobilenet
@@ -26,7 +26,7 @@ spec:
       containers:
       - name: extract-worker-mobilenet
         image: eu.gcr.io/gothic-module-289816/extract_worker 
-        imagePullPolicy: IfNotPresent 
+        imagePullPolicy: Always 
         ports:
         - containerPort: 5000
         volumeMounts:
@@ -35,6 +35,8 @@ spec:
         env:
         - name: ML_MODEL 
           value: "mobilenet"
+        - name: MODEL_URL
+          value: ""
       volumes:
         - name: myclaim 
           persistentVolumeClaim:

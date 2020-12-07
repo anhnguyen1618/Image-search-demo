@@ -1,3 +1,4 @@
+#!/bin/bash
 time_count=0
 max_count=24
 echo "============== Creating config pods (~1 min) =============="

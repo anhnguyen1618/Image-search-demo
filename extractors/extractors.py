@@ -32,6 +32,7 @@ def download_model(model_url):
     return path_dir
 
 def model_picker(name, model_url = ""):
+    print(f"Picking model {name} with custom url({model_url})")
     if model_url:
         if model_url[0] == "\"":
             model_url = model_url[1:-1]

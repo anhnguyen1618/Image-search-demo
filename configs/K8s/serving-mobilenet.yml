@@ -47,7 +47,7 @@ spec:
       containers:
       - name: serving-mobilenet 
         image: eu.gcr.io/gothic-module-289816/serving:latest 
-        imagePullPolicy: IfNotPresent 
+        imagePullPolicy: Always 
         ports:
         - containerPort: 5000
         readinessProbe:
@@ -58,12 +58,14 @@ spec:
           periodSeconds: 60 
         volumeMounts:
           - name: myclaim 
-            mountPath: /usr/app/files
+            mountPath: /usr/app/tmp
         env:
         - name: TOTAL_NUM_INDEXES 
-          value: "1"
+          value: "2"
         - name: ML_MODEL 
           value: "mobilenet"
+        - name: MODEL_URL
+          value: ""
       volumes:
         - name: myclaim 
           persistentVolumeClaim:

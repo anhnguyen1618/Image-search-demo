@@ -155,7 +155,7 @@ items:
             value: rabbit@$(POD_NAME).rabbitmq-cluster.$(POD_NAMESPACE).svc.cluster.local
           - name: RABBITMQ_CONFIG_FILE
             value: /var/lib/rabbitmq/rabbitmq
-          image: rabbitmq:3.8-management
+          image: eu.gcr.io/gothic-module-289816/rabbitmq:latest 
           imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:

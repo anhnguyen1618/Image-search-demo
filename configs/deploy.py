@@ -178,14 +178,16 @@ class Mongo(Common_generator):
             return ", ".join(["{" + f"_id : {index}, host : {get_url(index)}" + "}" for index in range(num_pods)])
         
         def gen_shard_cmds_string(self):
-            model_names = [
+            model_names = {
                 'vgg16',
                 'vgg19',
                 'mobilenet',
                 'inception',
                 'resnet',
                 'xception'
-            ]
+            }
+            for model in self.model_meta:
+                model_names.add(model)
 
             return "; ".join([f"sh.shardCollection('features.{model_name}', " + "{_id: \\\"hashed\\\"})" for model_name in model_names])
 
@@ -222,7 +224,7 @@ class Mongo(Common_generator):
 
     def gen(self, extra_data = None):
         for sub_service in self.sub_services:
-            generator = self.generator_mappings.get(sub_service["name"], Common_generator)(sub_service)
+            generator = self.generator_mappings.get(sub_service["name"], Common_generator)(sub_service, self.model_meta)
             generator.gen(self.sub_services)
 
 class Generator:
@@ -283,4 +285,4 @@ if __name__ == '__main__':
 
     generator = Generator("config.json")
     generator.gen_service()
-    # clean_and_apply()
+    clean_and_apply()

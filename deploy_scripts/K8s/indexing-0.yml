@@ -29,7 +29,7 @@ spec:
       containers:
       - name: indexing-0 
         image: zozonguyen1/indexing:latest
-        imagePullPolicy: Always 
+        imagePullPolicy: IfNotPresent 
         ports:
         - containerPort: 5000
         env:
