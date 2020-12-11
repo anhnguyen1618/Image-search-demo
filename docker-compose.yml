@@ -1,7 +1,6 @@
 version: "2"
 services:
-    serving:
-        container_name: extractor_rest_test 
+    serving-mobilenet:
         image: extractor_rest:v2 
         build: 
             context: ./ 
@@ -64,6 +63,11 @@ services:
             - rabbitmq
         ports:
             - "4000:5000"
+        volumes:
+            - ./extract_worker:/usr/app
+            - ./bucket/bucket.py:/usr/app/bucket.py
+            - ./utilities/utilities.py:/usr/app/utilities.py
+            - ./extractors/extractors.py:/usr/app/extractors.py
 
     rabbitmq:
         image: "rabbitmq:3-management"

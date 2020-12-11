@@ -56,12 +56,7 @@ async def aggregate(payload, res):
         
     res["results"] = results 
 
-def search_from_index(payload, num_records=5):
-    loop = asyncio.new_event_loop()
-    res = {"results":[]}
-    loop.run_until_complete(aggregate(payload, res))
-    res["results"].sort(key=lambda x: x["distance"])
-    return res["results"][:num_records]
+
 
 
 class Observer:
@@ -75,6 +70,13 @@ class Observer:
 
 observer = Observer()
 
+@observer.search_time.time()
+def search_from_index(payload, num_records=5):
+    loop = asyncio.new_event_loop()
+    res = {"results":[]}
+    loop.run_until_complete(aggregate(payload, res))
+    res["results"].sort(key=lambda x: x["distance"])
+    return res["results"][:num_records]
 
 @app.route("/")
 def index():
@@ -84,17 +86,18 @@ def index():
 @observer.failure_count.count_exceptions()
 @observer.request_time.time()
 def search():
+    use_json = request.args.get('json', type=bool)
+    if use_json:
+        payload = request.get_json()
+        return json.dumps(search_from_index(payload)) 
+
     if request.files and request.files['record'] and allowed_file(request.files['record'].filename): 
         file = request.files['record']
         path = save_file(file)
         feature_vector = extract_features(path, model)
         payload = feature_vector.tolist()
 
-        @observer.search_time.time()
-        def f():
-            return search_from_index(payload)
-
-        results = f()
+        results = search_from_index(payload) 
 
         return render_template("index.html", results = results)
         # return res.content
