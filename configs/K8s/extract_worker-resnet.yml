@@ -37,6 +37,10 @@ spec:
           value: "resnet"
         - name: MODEL_URL
           value: ""
+        - name: DEDUPLICATE_MODEL
+          value: "mobilenet"
+        - name: DEDUPLICATE_THRESHOLD
+          value: "0"
       volumes:
         - name: myclaim 
           persistentVolumeClaim:

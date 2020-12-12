@@ -52,7 +52,6 @@ async def aggregate(payload, res):
             continue
 
         results += response.json()
-        print(response.json(), flush=True)
         
     res["results"] = results 
 

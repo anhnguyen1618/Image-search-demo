@@ -37,6 +37,10 @@ spec:
           value: "{model}"
         - name: MODEL_URL
           value: "{model_url}"
+        - name: DEDUPLICATE_MODEL
+          value: "{deduplicate_model}"
+        - name: DEDUPLICATE_THRESHOLD
+          value: "{deduplicate_threshold}"
       volumes:
         - name: myclaim 
           persistentVolumeClaim:

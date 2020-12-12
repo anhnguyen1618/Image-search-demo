@@ -68,7 +68,7 @@ class Worker:
     def check_duplication(self, img_name, feature):
         response = requests.post(f"http://serving-{self.deduplicate_model}:5000/search?json=true", json=feature.tolist()) 
         if response.status_code != 200:
-            print("Deduplicate request fails for image")
+            print(f"Deduplicate request fails for image {img_name}")
             return False 
         result = response.json()
 
@@ -78,7 +78,7 @@ class Worker:
         best_match = result[0]["distance"]
         is_duplicated = best_match <= self.deduplicate_threshold
         if is_duplicated:
-            print(f"Image ${img_name} already exists")
+            print(f"Image {img_name} already exists")
             self.channel.basic_publish(exchange = "", routing_key = "duplicated_files", body = img_name)
         return is_duplicated
 

@@ -5,7 +5,8 @@
     },
     {
       "name": "mobilenet",
-      "deduplication": true
+      "deduplicate": true,
+      "threshold": 0.0
     },
     {
       "name": "custom",
@@ -26,7 +27,6 @@
         },
         {
           "name": "custom",
-          "num_indexes": 1,
           "pods": 1
         }
       ]
@@ -65,7 +65,6 @@
         },
         {
           "name": "custom",
-          "num_indexes": 1,
           "pods": 1
         }
       ] 

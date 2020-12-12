@@ -1,100 +1,154 @@
 version: "2"
 services:
-    serving-mobilenet:
-        image: extractor_rest:v2 
-        build: 
-            context: ./ 
-            dockerfile: extractors/Dockerfile 
-        ports:
-            - "5000:5000"
-        environment:
-            - TOTAL_NUM_INDEXES=1
-            - ML_MODEL=inception
-            - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
-        volumes:
-            - ./extractors:/usr/app
+    # serving-mobilenet:
+    #     image: extractor_rest:v2 
+    #     build: 
+    #         context: ./ 
+    #         dockerfile: extractors/Dockerfile 
+    #     ports:
+    #         - "5000:5000"
+    #     environment:
+    #         - TOTAL_NUM_INDEXES=1
+    #         - ML_MODEL=inception
+    #         - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
+    #     volumes:
+    #         - ./extractors:/usr/app
 
-    indexing-inception-1:
-        container_name: indexing-inception-1 
-        image: indexing
-        build: 
-            context: ./ 
-            dockerfile: index/Dockerfile 
-        ports:
-            - "9000:5000"
-        environment:
-            - TOTAL_NUM_INDEXES=1
-            - CURRENT_INDEX=1
-            - ML_MODEL=inception
-            - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
-            - INDEX_ALGORITHM=kd_tree
-        volumes:
-            - ./index:/usr/app
-        depends_on: 
-            - mongos
-
-    # indexing-2:
-    #     container_name: indexing-2
+    # indexing-inception-1:
+    #     container_name: indexing-inception-1 
     #     image: indexing
     #     build: 
     #         context: ./ 
-    #         dockerfile: index/Dockerfile  
+    #         dockerfile: index/Dockerfile 
     #     ports:
-    #         - "9001:5000"
+    #         - "9000:5000"
     #     environment:
-    #         - TOTAL_NUM_INDEXES=2
+    #         - TOTAL_NUM_INDEXES=1
     #         - CURRENT_INDEX=1
-    #         - ML_MODEL="resnet"
+    #         - ML_MODEL=inception
+    #         - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
+    #         - INDEX_ALGORITHM=kd_tree
     #     volumes:
     #         - ./index:/usr/app
     #     depends_on: 
     #         - mongos
 
-    extract_worker:
-        container_name: extract_worker
-        build: 
-            context: ./ 
-            dockerfile: extract_worker/Dockerfile
-        image: extract_worker 
-        environment:
-            - ML_MODEL=inception
-            - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
-        depends_on: 
-            - rabbitmq
-        ports:
-            - "4000:5000"
-        volumes:
-            - ./extract_worker:/usr/app
-            - ./bucket/bucket.py:/usr/app/bucket.py
-            - ./utilities/utilities.py:/usr/app/utilities.py
-            - ./extractors/extractors.py:/usr/app/extractors.py
+    # # indexing-2:
+    # #     container_name: indexing-2
+    # #     image: indexing
+    # #     build: 
+    # #         context: ./ 
+    # #         dockerfile: index/Dockerfile  
+    # #     ports:
+    # #         - "9001:5000"
+    # #     environment:
+    # #         - TOTAL_NUM_INDEXES=2
+    # #         - CURRENT_INDEX=1
+    # #         - ML_MODEL="resnet"
+    # #     volumes:
+    # #         - ./index:/usr/app
+    # #     depends_on: 
+    # #         - mongos
 
-    rabbitmq:
-        image: "rabbitmq:3-management"
-        ports:
-        - "7672:5672"
-        - "7000:15672"       
-        environment:
-            - RABBITMQ_DEFAULT_USER=admin
-            - RABBITMQ_DEFAULT_PASS=admin
-        volumes:
-        - './rabbitmq_data:/data'
+    # extract_worker:
+    #     container_name: extract_worker
+    #     build: 
+    #         context: ./ 
+    #         dockerfile: extract_worker/Dockerfile
+    #     image: extract_worker 
+    #     environment:
+    #         - ML_MODEL=inception
+    #         - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
+    #         - DEDUPLICATE_MODEL=mobilenet
+    #         - DEDUPLICATE_THRESHOLD=0
+    #     depends_on: 
+    #         - rabbitmq
+    #     ports:
+    #         - "4000:5000"
+    #     volumes:
+    #         - ./extract_worker:/usr/app
+    #         - ./bucket/bucket.py:/usr/app/bucket.py
+    #         - ./utilities/utilities.py:/usr/app/utilities.py
+    #         - ./extractors/extractors.py:/usr/app/extractors.py
+
+    # rabbitmq:
+    #     image: "rabbitmq:3-management"
+    #     ports:
+    #     - "7672:5672"
+    #     - "7000:15672"       
+    #     environment:
+    #         - RABBITMQ_DEFAULT_USER=admin
+    #         - RABBITMQ_DEFAULT_PASS=admin
+    #     volumes:
+    #     - './rabbitmq_data:/data'
     
-    rabbitmq_wrapper:
-        container_name: rabbitmq_wrapper
-        image: rabbitmq_wrapper
-        build: 
-            context: ./ 
-            dockerfile: rabbitmq_wrapper/Dockerfile 
-        volumes:
-            - ./rabbitmq_wrapper:/usr/app
-        ports:
-            - "8000:5000"
+    # rabbitmq_wrapper:
+    #     container_name: rabbitmq_wrapper
+    #     image: rabbitmq_wrapper
+    #     build: 
+    #         context: ./ 
+    #         dockerfile: rabbitmq_wrapper/Dockerfile 
+    #     volumes:
+    #         - ./rabbitmq_wrapper:/usr/app
+    #     ports:
+    #         - "8000:5000"
 
-    mongos:
-        container_name: mongos
-        image: mongo:4.2.0
-        volumes:
-            - ./mongo-volume:/data/db
+    # mongos:
+    #     container_name: mongos
+    #     image: mongo:4.2.0
+    #     volumes:
+    #         - ./mongo-volume:/data/db
+    #     ports:
+    #         - "1048:27017"
+    
+
+    postgres:
+        image: postgres:12
+        environment:
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
         ports:
-            - "1048:27017"
+            - "5433:5432"
+
+    scheduler:
+        image: apache/airflow
+        restart: always
+        depends_on:
+            - postgres
+            - webserver
+        build:
+            context: ./
+        env_file:
+            - airflow/.env
+        ports:
+            - "8793:8793"
+        volumes:
+            - ./airflow:/opt/airflow
+        command: scheduler
+        healthcheck:
+            test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+            interval: 30s
+            timeout: 30s
+            retries: 3
+
+    webserver:
+        image: apache/airflow
+        hostname: webserver
+        restart: always
+        depends_on:
+            - postgres
+        env_file:
+            - airflow/.env
+        volumes:
+            - ./airflow:/opt/airflow
+        ports:
+            - "8080:8080"
+        build:
+            context: .
+        entrypoint: ./entrypoint.sh
+        healthcheck:
+            test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+            interval: 30s
+            timeout: 30s
+            retries: 32

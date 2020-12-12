@@ -27,6 +27,7 @@ def connect_to_queue(rabbitmq_hostname):
 rabbitmq_hostname = "rabbitmq"
 publisher = connect_to_queue(rabbitmq_hostname)
 
+
 class Observer:
     def __init__(self):
         self.metrics = {}

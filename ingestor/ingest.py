@@ -43,8 +43,8 @@ if __name__ == "__main__":
     BUCKET_NAME = "images-search"
     model_name = "resnet"
     QUEUE_NAME = model_name
-    # RABBITMQ_URL = "http://rabbitmq-wrapper-mongo.rahtiapp.fi"
-    RABBITMQ_URL = "http://localhost:8000"
+    RABBITMQ_URL = "http://rabbitmq-wrapper-mongo.rahtiapp.fi"
+    # RABBITMQ_URL = "http://localhost:8000"
 
     ingestor = Ingestor(BUCKET_NAME, RABBITMQ_URL, QUEUE_NAME)
     data_dir = "../dataset"

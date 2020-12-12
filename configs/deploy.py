@@ -1,4 +1,4 @@
-import os, json
+import os, json, sys, stat
 import subprocess
 
 stage_dir = "./staging"
@@ -15,23 +15,41 @@ class Common_generator:
         print(f"Service {self.data['name']} generator is missing")
 
 class Extract_worker(Common_generator):
-    def gen_from_template(self, model_name, num_pods, model_url = ""):
+    def gen_from_template(self, model_name, num_pods, deduplicate_model, deduplicate_threshold, model_url = ""):
         template_file = open(f"{self.template_dir}/extract_worker.yml")
         template_content = template_file.read()
+
         content = (
             template_content
             .replace("{model}", model_name)
             .replace("{model_url}", model_url)
-            .replace("{num_pods}", str(num_pods)))
+            .replace("{num_pods}", str(num_pods))
+            .replace("{deduplicate_model}", str(deduplicate_model))
+            .replace("{deduplicate_threshold}", str(deduplicate_threshold))
+            )
         file = open(f"{self.out_dir}/extract_worker-{model_name}.yml", "w") 
         file.write(content) 
         file.close()  
+    
+    def extract_deduplicate_info(self):
+        models = self.data["models"]
+        print(models)
+        if len(models) == 1:
+            return {"model": models[0]["name"], "threshold": models[0].get("deduplicate_threshold", 0)}
+
+        for _, model in self.model_meta.items():
+            if model.get("deduplicate", False):
+                return {"model": model["name"], "threshold": model.get("deduplicate_threshold", 0)}
+
+        raise Exception("It is required to specify deduplicate model")
+
 
     def gen(self, extra_data = None):
+        deduplicate_info = self.extract_deduplicate_info()
         for model in self.data["models"]:
             model_name = model["name"]
-            model_url = self.model_meta.get(model_name, "")
-            self.gen_from_template(model_name, model["pods"], model_url)
+            model_url = self.model_meta.get(model_name, {}).get("model_url", "") 
+            self.gen_from_template(model_name, model["pods"], deduplicate_info["model"], deduplicate_info["threshold"], model_url)
 
 class Indexing(Common_generator):
     def gen_from_template(self, model_name, num_indexes, num_pods, index_algorithm = "brute", model_url = ""):
@@ -53,7 +71,7 @@ class Indexing(Common_generator):
     def gen(self, extra_data = None):
         for model in self.data["models"]:
             model_name = model["name"]
-            model_url = self.model_meta.get(model_name, "")
+            model_url = self.model_meta.get(model_name, {}).get("model_url", "") 
             self.gen_from_template(model_name, model["num_indexes"], model["pods"], model.get("index_algorithm", "brute"), model_url)
         pass
 
@@ -88,7 +106,7 @@ class Serving(Common_generator):
         for model in self.models_data:
             model_name = model["name"]
             num_indexes = indexes.get(model_name, 0)
-            model_url = self.model_meta.get(model_name, "")
+            model_url = self.model_meta.get(model_name, {}).get("model_url", "") 
             if num_indexes == 0:
                 print(f"ERROR: Could not found index service for model {model_name}")
                 continue
@@ -131,9 +149,11 @@ class Mongo(Common_generator):
                     .replace("{condition_result}", condition_result)
                     .replace("{data_replicates}", self.gen_members(num_pods))
             )
-            file = open(f"{self.out_dir}/mongo_config_db.sh", "w") 
+            file_path = f"{self.out_dir}/mongo_config_db.sh"
+            file = open(file_path, "w") 
             file.write(content) 
             file.close()
+            os.chmod(file_path, 0o775)
         
         def gen_members(self, num_pods):
             def get_url(index):
@@ -204,10 +224,11 @@ class Mongo(Common_generator):
                     .replace("{shard_db_cmds}", self.gen_shard_cmds_string())
                     .replace("{data_replicates}", self.gen_members(num_pods))
             )
-            file = open(f"{self.out_dir}/mongo_shard.sh", "w") 
+            file_path = f"{self.out_dir}/mongo_shard.sh"
+            file = open(file_path, "w") 
             file.write(content) 
             file.close()
-
+            os.chmod(file_path, 0o775)
 
         def gen(self, extra_data = None):
             self.gen_yml()
@@ -245,8 +266,8 @@ class Generator:
         result = {}
         for model in models:
             name = model["name"]
-            model_url = model.get("model_url", "")
-            result[name] = model_url
+            result[name] = model 
+
         return result
 
     def gen_service(self):
@@ -275,6 +296,9 @@ def clean_and_apply():
     os.chdir("configs")
     execute(f"rm -r {main_dir} && mv {stage_dir} {main_dir} && mkdir {stage_dir}  && oc apply -f {main_dir}")
     execute("sh expose.sh")
+    os.chdir(main_dir)
+    execute("bash mongo_config_db.sh")
+    execute("bash mongo_shard.sh")
 
 if __name__ == '__main__':
     if not os.path.exists(stage_dir):
