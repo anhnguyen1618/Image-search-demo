@@ -129,7 +129,38 @@ class Rabbitmq(Common_generator):
         file.write(content) 
         file.close()
 
+class Nginx(Common_generator):
+    def gen_config(self):
+        server_content = ""
+        for model in self.data["serving_weights"]:
+            print(model)
+            server_content += f"server serving-{model['name']}:5000 weight={model['weight']};\n    "
 
+        template_file = open(f"{self.template_dir}/nginx.conf")
+        content = template_file.read().replace("{servers}", server_content)
+        file = open(f"{self.out_dir}/nginx.conf", "w") 
+        file.write(content) 
+        file.close()
+    
+    def build_docker_img(self):
+        execute(f"cp {self.template_dir}/Dockerfile-nginx staging")
+        os.chdir("staging")
+        execute("docker build -t eu.gcr.io/gothic-module-289816/nginx:latest . -f Dockerfile-nginx")
+        execute("docker push eu.gcr.io/gothic-module-289816/nginx:latest")
+        execute("rm Dockerfile-nginx")
+        os.chdir("..")
+    
+    def gen_yml(self):
+        template_file = open(f"{self.template_dir}/nginx.yml")
+        content = template_file.read().replace("{num_pods}", str(self.data["pods"]))
+        file = open(f"{self.out_dir}/nginx.yml", "w") 
+        file.write(content) 
+        file.close()
+
+    def gen(self, extra_data = None):
+        self.gen_config()
+        self.build_docker_img()
+        self.gen_yml()
 
 class Mongo(Common_generator):
     class Config_db(Common_generator):
@@ -258,7 +289,8 @@ class Generator:
             "serving": Serving,
             "rabbitmq_wrapper": Rabbitmq_wrapper,
             "rabbitmq": Rabbitmq,
-            "mongo": Mongo
+            "mongo": Mongo,
+            "nginx": Nginx
         }
         self.model_meta = self.gen_model_meta(self.data.get("models", []))
     
@@ -285,6 +317,7 @@ def execute(cmd):
         cmd = cmd.strip()
         subprocess.run(cmd.split(" "))
 
+
 def clean_and_apply():
     stage_files = set(os.listdir(stage_dir))
     for cur_file in os.listdir(main_dir):
@@ -309,4 +342,4 @@ if __name__ == '__main__':
 
     generator = Generator("config.json")
     generator.gen_service()
-    clean_and_apply()
+    # clean_and_apply()

@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: indexing-mobilenet-2 
+spec:
+  selector:
+    app: indexing-mobilenet-2 
+  ports:
+  - protocol: "TCP"
+    port: 5000
+    targetPort: 5000
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1 
+kind: Deployment 
+metadata:
+  name: indexing-mobilenet-2 
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 100%
+  selector:
+    matchLabels:
+      app: indexing-mobilenet-2 
+  template:
+    metadata:
+      labels:
+        app: indexing-mobilenet-2 
+        service: indexing
+    spec:
+      containers:
+      - name: indexing-mobilenet-2 
+        image: eu.gcr.io/gothic-module-289816/indexing:latest
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 5000
+        env:
+        - name: TOTAL_NUM_INDEXES 
+          value: "2"
+        - name: CURRENT_INDEX 
+          value: "2"
+        - name: ML_MODEL 
+          value: "mobilenet" 
+        - name: MODEL_URL 
+          value: "" 
+        - name: INDEX_ALGORITHM
+          value: "brute"

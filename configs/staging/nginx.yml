@@ -1,0 +1,47 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: myclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: serving 
+  labels:
+    type: public
+spec:
+  selector:
+    app: serving 
+  ports:
+  - protocol: "TCP"
+    port: 8081 
+    targetPort: 8081
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1 
+kind: Deployment 
+metadata:
+  name: serving 
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: serving 
+  template:
+    metadata:
+      labels:
+        app: serving 
+    spec:
+      containers:
+      - name: serving 
+        image: eu.gcr.io/gothic-module-289816/nginx:latest 
+        imagePullPolicy: Always 
+        ports:
+        - containerPort: 8081
