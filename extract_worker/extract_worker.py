@@ -107,8 +107,8 @@ if __name__ == '__main__':
     ML_MODEL = os.getenv('ML_MODEL', "resnet")
     algorithm = ML_MODEL 
     MODEL_URL = os.getenv("MODEL_URL", "")
-    DEDUPLICATE_MODEL = os.getenv("DEDUPLICATE_MODEL", "mobilenet")
-    DEDUPLICATE_THRESHOLD = float(os.getenv("DEDUPLICATE_THRESHOLD", 0))
+    DEDUPLICATE_MODEL = "" #os.getenv("DEDUPLICATE_MODEL", "mobilenet")
+    DEDUPLICATE_THRESHOLD = "" #float(os.getenv("DEDUPLICATE_THRESHOLD", 0))
 
     bucket_name = "images-search"
     # mongo_address = "mongo_test:27017" 
