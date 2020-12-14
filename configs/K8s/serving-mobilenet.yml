@@ -4,6 +4,7 @@ metadata:
   name: serving-mobilenet 
   labels:
     type: public
+    service: serving
 spec:
   selector:
     app: serving-mobilenet
@@ -12,25 +13,13 @@ spec:
     port: 5000
     targetPort: 5000
   type: LoadBalancer
-
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: myclaim
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
 ---
 apiVersion: apps/v1 
 kind: Deployment 
 metadata:
   name: serving-mobilenet
 spec:
-  replicas: 1 
+  replicas: 3 
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -55,13 +44,19 @@ spec:
             path: /
             port: 5000 
           initialDelaySeconds: 5
-          periodSeconds: 60 
+          periodSeconds: 10 
+        # livenessProbe:
+        #   httpGet:
+        #     path: /
+        #     port: 5000 
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 10
         volumeMounts:
           - name: myclaim 
             mountPath: /usr/app/tmp
         env:
         - name: TOTAL_NUM_INDEXES 
-          value: "2"
+          value: "1"
         - name: ML_MODEL 
           value: "mobilenet"
         - name: MODEL_URL

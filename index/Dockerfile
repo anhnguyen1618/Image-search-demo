@@ -7,6 +7,7 @@ RUN pip install -r requirements.txt
 
 COPY ./index/index_server.py index_server.py
 COPY ./index/index.py index.py
+COPY ./utilities/utilities.py utilities.py
 
 EXPOSE 9000
 

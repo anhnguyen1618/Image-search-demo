@@ -1,6 +1,6 @@
 #!/bin/bash
 time_count=0
-max_count=24
+max_count=30
 echo "============== Creating config pods (~1 min) =============="
 while [[ $(oc get pods -l name="configdb" -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True True True" ]]
 do

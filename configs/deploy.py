@@ -92,9 +92,9 @@ class Serving(Common_generator):
                     result[model["name"]] = model["num_indexes"]
         return result 
     
-    def gen_from_template(self, model_name, num_indexes, model_url = ""):
+    def gen_from_template(self, model_name, num_pods, num_indexes, model_url = ""):
         template_file = open(f"{self.template_dir}/serving.yml")
-        content = template_file.read().replace("{model}", model_name).replace("{model_url}", model_url).replace("{num_indexes}", str(num_indexes))
+        content = template_file.read().replace("{model}", model_name).replace("{model_url}", model_url).replace("{num_pods}", str(num_pods)).replace("{num_indexes}", str(num_indexes))
                 
         file = open(f"{self.out_dir}/serving-{model_name}.yml", "w") 
         file.write(content) 
@@ -106,12 +106,13 @@ class Serving(Common_generator):
         for model in self.models_data:
             model_name = model["name"]
             num_indexes = indexes.get(model_name, 0)
+            num_pods = model["pods"]
             model_url = self.model_meta.get(model_name, {}).get("model_url", "") 
             if num_indexes == 0:
                 print(f"ERROR: Could not found index service for model {model_name}")
                 continue
             
-            self.gen_from_template(model_name, num_indexes, model_url)
+            self.gen_from_template(model_name, num_pods, num_indexes, model_url)
 
 class Rabbitmq_wrapper(Common_generator):
     def gen(self, extra_data = None):
@@ -324,9 +325,10 @@ def clean_and_apply():
         if cur_file not in stage_files:
             execute(f"oc delete -f {main_dir}/{cur_file}")
 
-    os.chdir("..")
+    # os.chdir("..")
+    # execute("cp templates/volume-claim.yml staging")
     # execute("./build-docker-img.sh")
-    os.chdir("configs")
+    # os.chdir("configs")
     execute(f"rm -r {main_dir} && mv {stage_dir} {main_dir} && mkdir {stage_dir}  && oc apply -f {main_dir}")
     execute("sh expose.sh")
     os.chdir(main_dir)
@@ -342,4 +344,4 @@ if __name__ == '__main__':
 
     generator = Generator("config.json")
     generator.gen_service()
-    # clean_and_apply()
+    clean_and_apply()

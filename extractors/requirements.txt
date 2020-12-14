@@ -3,3 +3,5 @@ pillow
 numpyencoder
 asyncio
 prometheus_client
+gevent
+gunicorn

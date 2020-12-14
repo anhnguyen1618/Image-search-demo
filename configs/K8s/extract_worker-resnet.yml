@@ -1,13 +1,19 @@
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: Service
 metadata:
-  name: myclaim
+  name: extract-worker-resnet 
+  labels:
+    type: public
+    service: extract-worker
 spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
+  selector:
+    app: extract-worker-resnet
+  ports:
+  - protocol: "TCP"
+    port: 5000
+    targetPort: 5000
+  type: LoadBalancer
+
 ---
 apiVersion: apps/v1 
 kind: Deployment 

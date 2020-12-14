@@ -1,8 +1,0 @@
-version: "2"
-services:
-    index:
-        container_name: index 
-        image: index:v1 
-        build: .
-        ports:
-            - "9000:5000"

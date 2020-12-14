@@ -8,8 +8,9 @@ sys.path.append(os.path.abspath('../bucket'))
 sys.path.append(os.path.abspath('../extractors'))
 from bucket import Bucket
 from extractors import model_picker, extract_features
+from utilities import Logger
 
-REQUEST_TIME = Summary('processing_duration', 'Time spent processing 1 image')
+REQUEST_TIME = Summary('extract_worker_processing_duration', 'Time spent processing 1 image')
 FAILURE_COUNTER = Counter('number_of_exception', 'Number of exception')
 
 class Worker:
@@ -21,13 +22,14 @@ class Worker:
         self.bucket_name = params["bucket_name"]
         self.deduplicate_model = params["deduplicate_model"]
         self.deduplicate_threshold = params["deduplicate_threshold"]
+        self.logger = Logger()
 
         while True:
             try:
                 if self.set_up_rabbitmq_connection(host_name, queue_name):
                     break
             except Exception as e:
-                print(e)
+                self.logger.error(f"Failed to connect to rabbitmq queue {queue_name} at {host_name}. Reason: {e}")
                 time.sleep(3)
                 continue
 
@@ -37,11 +39,10 @@ class Worker:
         
         self.bucket_handler = Bucket(bucket_name)
 
-        print(f"Extract worker for model: {queue_name}")
-        # change model later
+        self.logger.info(f"Extract worker for model: {queue_name}")
         self.model = model_picker(queue_name, model_url)
 
-        # set up db
+        self.logger.info(f"Connecting to mongodb at {mongo_address}")
         client = MongoClient(mongo_address)
         self.db = client.features
         
@@ -87,7 +88,7 @@ class Worker:
     @REQUEST_TIME.time()
     def process(self, ch, method, properties, file_name):
         file_name = file_name.decode()
-        print("file name", file_name)
+        print(f"Processing file {file_name}")
         downloaded_dir = "./tmp"
         local_file_path = self.bucket_handler.download(file_name, downloaded_dir)
         feature = extract_features(local_file_path, self.model)
@@ -99,7 +100,6 @@ class Worker:
                 return
 
         self.db[self.model_name].insert_one({"url": self.get_public_url(file_name), "feature": feature.tolist()})
-        print("-------------------------------")
         self.channel.basic_ack(delivery_tag=method.delivery_tag)
 
 

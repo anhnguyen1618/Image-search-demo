@@ -2,7 +2,7 @@
 SHARD_COUNT={num_shards}
 shards=0
 time_count=0
-max_count=24
+max_count=30
 
 while [[ $shards -lt $SHARD_COUNT ]]
 do

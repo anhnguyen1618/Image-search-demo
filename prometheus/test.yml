@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: serving-custom  
+  namespaceSelector:
+    matchNames:
+    - default
+  endpoints:
+  - ports:
+    - containerPort: 5000 
+  interval: 30s

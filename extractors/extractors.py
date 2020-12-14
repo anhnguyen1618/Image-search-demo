@@ -16,6 +16,9 @@ from tensorflow.keras.applications.mobilenet import MobileNet
 from tensorflow.keras.applications.inception_v3 import InceptionV3
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.layers import Input, Flatten, Dense, Dropout, GlobalAveragePooling2D
+from utilities import Logger
+
+# logger = Logger()
 
 def download_model(model_url):
     file_name = model_url.rsplit('/', 1)[1] if model_url.find('/') else ""
@@ -32,7 +35,7 @@ def download_model(model_url):
     return path_dir
 
 def model_picker(name, model_url = ""):
-    print(f"Picking model {name} with custom url({model_url})")
+    # logger.info(f"Picking model {name} with custom url({model_url})")
     if model_url:
         if model_url[0] == "\"":
             model_url = model_url[1:-1]
@@ -74,7 +77,8 @@ def model_picker(name, model_url = ""):
                          input_shape=(224, 224, 3),
                          pooling='max')
     else:
-        print("Specified model not available")
+        pass
+        # logger.error("Specified model not available")
     return model
 
 

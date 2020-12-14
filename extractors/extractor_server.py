@@ -4,9 +4,10 @@ import uuid, os, json, time
 from extractors import model_picker, extract_features
 import prometheus_client
 from prometheus_client import start_http_server, Summary, Counter
+from utilities import Logger
 
+# logger = Logger()
 TOTAL_NUM_INDEXES = int(os.getenv('TOTAL_NUM_INDEXES', 1))
-# TODO: use model to fetch correct service later
 ML_MODEL = os.getenv('ML_MODEL', "resnet")
 
 FILE_UPLOAD_DIR = os.getcwd() + "/tmp"
@@ -48,21 +49,18 @@ async def aggregate(payload, res):
     ]
     for response in await asyncio.gather(*futures):
         if response.status_code != 200:
-            print(f"Error fetching results from {response.url}")
+            logger.error(f"Error fetching results from {response.url}")
             continue
 
         results += response.json()
         
     res["results"] = results 
 
-
-
-
 class Observer:
     def __init__(self):
-        self.request_time = Summary('processing_duration', 'Time spent indexing')
+        self.request_time = Summary('serving_processing_duration', 'Time spent indexing')
         self.failure_count = Counter('num_of_exception', 'Number of exception')
-        self.search_time = Summary("search_duration", "Time spent in searching")
+        self.search_time = Summary("serving_search_duration", "Time spent in searching")
 
     def gen_report(self):
         return [ prometheus_client.generate_latest(v) for v in [self.request_time, self.failure_count, self.search_time] ]
@@ -114,7 +112,6 @@ def changemodel(new_model_name):
     model = new_model
     model_name = new_model_name
     msg = f"Changed model from {model_name} to {new_model_name}"
-    print(msg)
 
     return msg
 
@@ -122,5 +119,5 @@ def changemodel(new_model_name):
 def metrics():
     return Response(observer.gen_report(), mimetype="text/plain")
 
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+# if __name__ == "__main__":
+#     app.run(host='0.0.0.0', port=5000)

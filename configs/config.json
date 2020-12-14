@@ -36,18 +36,18 @@
       "models": [
         {
           "name": "resnet",
-          "num_indexes": 2,
-          "pods": 1,
-          "index_algorithm": "kd_tree"
+          "num_indexes": 1,
+          "pods": 5,
+          "index_algorithm": "brute"
         },
         {
           "name": "mobilenet",
-          "num_indexes": 2,
+          "num_indexes": 1,
           "pods": 1 
         },
         {
           "name": "custom",
-          "num_indexes": 2,
+          "num_indexes": 1,
           "pods": 1
         }
       ]
@@ -57,15 +57,15 @@
       "models": [
         {
           "name": "resnet",
-          "pods": 1
+          "pods": 5 
         },
         {
           "name": "mobilenet",
-          "pods": 1
+          "pods": 3 
         },
         {
           "name": "custom",
-          "pods": 1
+          "pods": 3 
         }
       ] 
     },
@@ -75,7 +75,7 @@
       "serving_weights": [
         {
           "name": "resnet",
-          "weight": 2
+          "weight": 1 
         },
         {
           "name": "mobilenet",

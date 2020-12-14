@@ -31,6 +31,6 @@ spec:
       containers:
       - name: rabbitmq-wrapper 
         image: eu.gcr.io/gothic-module-289816/rabbitmq_wrapper:latest 
-        imagePullPolicy: IfNotPresent 
+        imagePullPolicy: Always 
         ports:
         - containerPort: 5000

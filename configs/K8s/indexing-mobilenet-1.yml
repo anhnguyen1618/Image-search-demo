@@ -2,6 +2,9 @@ apiVersion: v1
 kind: Service
 metadata:
   name: indexing-mobilenet-1 
+  labels:
+    service: indexing
+
 spec:
   selector:
     app: indexing-mobilenet-1 
@@ -38,9 +41,12 @@ spec:
         imagePullPolicy: Always 
         ports:
         - containerPort: 5000
+        volumeMounts:
+          - name: myclaim 
+            mountPath: /usr/app/tmp
         env:
         - name: TOTAL_NUM_INDEXES 
-          value: "2"
+          value: "1"
         - name: CURRENT_INDEX 
           value: "1"
         - name: ML_MODEL 
@@ -49,3 +55,7 @@ spec:
           value: "" 
         - name: INDEX_ALGORITHM
           value: "brute"
+      volumes:
+        - name: myclaim 
+          persistentVolumeClaim:
+            claimName: myclaim
