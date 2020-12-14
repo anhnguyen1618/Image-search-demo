@@ -55,6 +55,6 @@ def search():
 def metrics():
     return Response(observer.gen_report(), mimetype="text/plain")
 
-if __name__ == "__main__":
-    reindex()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+# if __name__ == "__main__":
+#     reindex()
+#     app.run(host='0.0.0.0', port=5000, debug=True)

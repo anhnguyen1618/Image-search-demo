@@ -3,3 +3,5 @@ pymongo
 sklearn
 pillow
 prometheus_client
+gunicorn
+gevent
