@@ -1,14 +1,3 @@
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: myclaim
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -45,3 +34,27 @@ spec:
         imagePullPolicy: Always 
         ports:
         - containerPort: 8081
+        volumeMounts:
+          - name: nginx-conf 
+            mountPath: /etc/nginx/conf.d
+      volumes:
+        - name: nginx-conf 
+          configMap:
+            defaultMode: 420
+            name: nginx-conf 
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+data:
+  default.conf: |
+    upstream loadbalancer {
+        {servers}
+    }
+    server {
+        listen      8081;
+        location / {
+            proxy_pass http://loadbalancer;
+        }
+    } 

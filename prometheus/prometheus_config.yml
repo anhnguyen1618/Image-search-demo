@@ -1,0 +1,106 @@
+global:
+    scrape_interval: 5s
+    scrape_timeout: 2s
+  
+  rule_files:
+    - alert.yml
+  
+  scrape_configs:
+    - job_name: extract-worker-custom
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'extract-worker-custom-59b85b569d-m7bq9.extract-worker-custom.mongo.svc.cluster.local:5000'
+
+    - job_name: extract-worker-mobilenet
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'extract-worker-mobilenet-644c869fbc-4j65t.extract-worker-mobilenet.mongo.svc.cluster.local:5000'
+
+    - job_name: extract-worker-resnet
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'extract-worker-resnet-58c6b847d7-cxp88.extract-worker-resnet.mongo.svc.cluster.local:5000'
+
+    - job_name: indexing-custom-1
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'indexing-custom-1-79bb949578-887fq.indexing-custom-1.mongo.svc.cluster.local:5000'
+
+    - job_name: indexing-mobilenet-1
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'indexing-mobilenet-1-6c776fc887-8dwkd.indexing-mobilenet-1.mongo.svc.cluster.local:5000'
+
+    - job_name: indexing-resnet-1
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'indexing-resnet-1-d5cf5f8bf-glb7v.indexing-resnet-1.mongo.svc.cluster.local:5000'
+
+    - job_name: serving-custom
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - '.serving-custom.mongo.svc.cluster.local:5000'
+
+    - job_name: serving-mobilenet
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - '.serving-mobilenet.mongo.svc.cluster.local:5000'
+
+    - job_name: serving-resnet
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'serving-resnet-57ffd6cd7f-55jzx.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-57lcb.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-6kjzh.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-88x7x.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-9tdn8.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-b4ghv.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-df879.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-f8lbq.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-fm4kp.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-hrm58.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-jxwdx.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-l6ghk.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-p6h92.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-pxfbt.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-qhn2k.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-ql6jg.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-rfcmz.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-tkgnb.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-w9qvf.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-xw46s.serving-resnet.mongo.svc.cluster.local:5000'
+
+
+    # - job_name: index_services
+    #   metrics_path: /metrics
+    #   static_configs:
+    #     - targets:
+    #         - 'indexing-mobilenet-1-mongo.rahtiapp.fi'
+    #         # - 'indexing-mobilenet-2-mongo.rahtiapp.fi'
+    #         - 'indexing-resnet-1-mongo.rahtiapp.fi'
+    #         # - 'indexing-resnet-2-mongo.rahtiapp.fi'
+    #         - 'indexing-custom-1-mongo.rahtiapp.fi'
+    #         # - 'indexing-custom-2-mongo.rahtiapp.fi'
+    # - job_name: extract_worker_services
+    #   metrics_path: /metrics
+    #   static_configs:
+    #     - targets:
+    #         - 'extract-worker-custom-mongo.rahtiapp.fi'
+    #         - 'extract-worker-resnet-mongo.rahtiapp.fi'
+    #         - 'extract-worker-mobilenet-mongo.rahtiapp.fi'
+    # - job_name: serving_services 
+    #   metrics_path: /metrics
+    #   static_configs:
+    #     - targets:
+    #         - 'serving-mobilenet-mongo.rahtiapp.fi'
+    #         - 'serving-resnet-mongo.rahtiapp.fi'
+    #         - 'serving-custom-mongo.rahtiapp.fi'

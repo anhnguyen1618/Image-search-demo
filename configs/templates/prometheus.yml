@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus 
+  labels:
+    type: public
+spec:
+  selector:
+    app: prometheus 
+  ports:
+  - protocol: "TCP"
+    port: 9090
+    targetPort: 9090 
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1 
+kind: Deployment 
+metadata:
+  name: prometheus 
+spec:
+  replicas: {num_pods} 
+  selector:
+    matchLabels:
+      app: prometheus 
+  template:
+    metadata:
+      labels:
+        app:  prometheus
+    spec:
+      containers:
+      - name: prometheus 
+        image: eu.gcr.io/gothic-module-289816/prometheus:latest 
+        imagePullPolicy: Always 
+        # command:
+        # - "prometheus"
+        # - "--web.enable-lifecycle"
+        # - "--config.file=/etc/prometheus/prometheus.yml"
+        ports:
+        - containerPort: 9090 
+        volumeMounts:
+        #   - name: myclaim 
+        #     mountPath: /etc/prometheus
+        - name: myclaim
+          mountPath: /prometheus
+        - name: prometheus-config-volume
+          mountPath: /etc/prometheus/
+      volumes:
+        - name: myclaim 
+          persistentVolumeClaim:
+            claimName: myclaim
+
+        - name: prometheus-config-volume
+          configMap:
+            defaultMode: 420
+            name: prometheus-server-conf
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server-conf
+  labels:
+    name: prometheus-server-conf
+data:
+  prometheus.yml: |-
+    global:
+        scrape_interval: 5s
+        scrape_timeout: 2s
+    # rule_files:
+    #   - alert.yml
+    scrape_configs:
+{jobs}

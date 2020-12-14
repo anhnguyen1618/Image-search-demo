@@ -1,0 +1,149 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus 
+  labels:
+    type: public
+spec:
+  selector:
+    app: prometheus 
+  ports:
+  - protocol: "TCP"
+    port: 9090
+    targetPort: 9090 
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1 
+kind: Deployment 
+metadata:
+  name: prometheus 
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: prometheus 
+  template:
+    metadata:
+      labels:
+        app:  prometheus
+    spec:
+      containers:
+      - name: prometheus 
+        image: eu.gcr.io/gothic-module-289816/prometheus:latest 
+        imagePullPolicy: Always 
+        # command:
+        # - "prometheus"
+        # - "--web.enable-lifecycle"
+        # - "--config.file=/etc/prometheus/prometheus.yml"
+        ports:
+        - containerPort: 9090 
+        volumeMounts:
+        #   - name: myclaim 
+        #     mountPath: /etc/prometheus
+        - name: myclaim
+          mountPath: /prometheus
+        - name: prometheus-config-volume
+          mountPath: /etc/prometheus/
+      volumes:
+        - name: myclaim 
+          persistentVolumeClaim:
+            claimName: myclaim
+
+        - name: prometheus-config-volume
+          configMap:
+            defaultMode: 420
+            name: prometheus-server-conf
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server-conf
+  labels:
+    name: prometheus-server-conf
+data:
+  prometheus.yml: |-
+    global:
+        scrape_interval: 5s
+        scrape_timeout: 2s
+    # rule_files:
+    #   - alert.yml
+    scrape_configs:
+    - job_name: extract-worker-custom
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'extract-worker-custom-59b85b569d-m7bq9.extract-worker-custom.mongo.svc.cluster.local:5000'
+
+    - job_name: extract-worker-mobilenet
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'extract-worker-mobilenet-644c869fbc-4j65t.extract-worker-mobilenet.mongo.svc.cluster.local:5000'
+
+    - job_name: extract-worker-resnet
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'extract-worker-resnet-58c6b847d7-cxp88.extract-worker-resnet.mongo.svc.cluster.local:5000'
+
+    - job_name: indexing-custom-1
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'indexing-custom-1-79bb949578-887fq.indexing-custom-1.mongo.svc.cluster.local:5000'
+
+    - job_name: indexing-mobilenet-1
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'indexing-mobilenet-1-6c776fc887-8dwkd.indexing-mobilenet-1.mongo.svc.cluster.local:5000'
+
+    - job_name: indexing-resnet-1
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'indexing-resnet-1-d5cf5f8bf-94jhw.indexing-resnet-1.mongo.svc.cluster.local:5000'
+            - 'indexing-resnet-1-d5cf5f8bf-glb7v.indexing-resnet-1.mongo.svc.cluster.local:5000'
+            - 'indexing-resnet-1-d5cf5f8bf-jnlrw.indexing-resnet-1.mongo.svc.cluster.local:5000'
+            - 'indexing-resnet-1-d5cf5f8bf-wjdzg.indexing-resnet-1.mongo.svc.cluster.local:5000'
+            - 'indexing-resnet-1-d5cf5f8bf-zlmn4.indexing-resnet-1.mongo.svc.cluster.local:5000'
+
+    - job_name: serving-custom
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'serving-custom-767d6474c6-4dqxf.serving-custom.mongo.svc.cluster.local:5000'
+
+    - job_name: serving-mobilenet
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'serving-mobilenet-556957cc7-dkx48.serving-mobilenet.mongo.svc.cluster.local:5000'
+
+    - job_name: serving-resnet
+      metrics_path: /metrics
+      static_configs:
+        - targets:
+            - 'serving-resnet-57ffd6cd7f-57lcb.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-64ncp.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-6wf4q.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-88x7x.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-bcd4x.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-d2tj7.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-ffbxx.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-ftr9d.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-gf8ld.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-h9mzf.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-k2xc7.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-n4l5g.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-nrsbs.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-qdz5r.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-ql6jg.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-rgp4s.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-sgh6z.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-tkgnb.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-xw46s.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-57ffd6cd7f-xzhpb.serving-resnet.mongo.svc.cluster.local:5000'
+
