@@ -20,7 +20,7 @@ kind: Deployment
 metadata:
   name: extract-worker-inception
 spec:
-  replicas: 1 
+  replicas: 0 
   selector:
     matchLabels:
       app: extract-worker-inception

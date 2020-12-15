@@ -37,6 +37,7 @@ async def aggregate(payload, res, size = 10):
     # res = requests.post(INDEX_URL+"/search", json=payload)
     results = []
     loop = asyncio.get_event_loop()
+    logger.error(size)
     futures = [
         loop.run_in_executor(
             None, 
@@ -69,7 +70,9 @@ class Observer:
 observer = Observer()
 
 @observer.search_time.time()
-def search_from_index(payload, num_records=5):
+def search_from_index(payload, num_records=15):
+
+    logger.error(num_records)
     loop = asyncio.new_event_loop()
     res = {"results":[]}
     loop.run_until_complete(aggregate(payload, res, num_records))
@@ -87,6 +90,7 @@ def search():
     use_json = request.args.get('json', type=bool)
     size= request.args.get('size', type=int) or 10
 
+    results = search_from_index([], size) 
     if request.files and request.files['record'] and allowed_file(request.files['record'].filename): 
         file = request.files['record']
         path = save_file(file)

@@ -30,11 +30,11 @@ class Index:
         self.logger.info(f"Load {num_of_records_per_index} / {total_num_of_records} records starting from index {start_index}")
         return list(self.db[model_name].find({}).skip(start_index).limit(num_of_records_per_index))
 
-    def query(self, vector, n_neighbors = 5):
+    def query(self, vector, size = 10):
         if not self.neighbors:
             return []
 
-        distances, indices = self.neighbors.kneighbors([vector], min(len(self.records), n_neighbors), return_distance = True)
+        distances, indices = self.neighbors.kneighbors([vector], min(len(self.records), size), return_distance = True)
         distances = distances[0]
         indices = indices[0]
         results = []

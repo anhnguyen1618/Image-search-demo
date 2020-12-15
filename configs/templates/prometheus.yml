@@ -54,20 +54,3 @@ spec:
           configMap:
             defaultMode: 420
             name: prometheus-server-conf
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: prometheus-server-conf
-  labels:
-    name: prometheus-server-conf
-data:
-  prometheus.yml: |-
-    global:
-        scrape_interval: 5s
-        scrape_timeout: 2s
-    # rule_files:
-    #   - alert.yml
-    scrape_configs:
-{jobs}

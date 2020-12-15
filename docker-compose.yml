@@ -6,13 +6,14 @@ services:
             context: ./ 
             dockerfile: extractors/Dockerfile 
         ports:
-            - "5000:5000"
+            - "5500:5000"
         environment:
             - TOTAL_NUM_INDEXES=1
             - ML_MODEL=inception
             - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
         volumes:
             - ./extractors:/usr/app
+            - ./extractors/extractor_server.py:/usr/app/app.py
             - ./utilities/utilities.py:/usr/app/utilities.py
 
     indexing-inception-1:
@@ -31,6 +32,7 @@ services:
             - INDEX_ALGORITHM=kd_tree
         volumes:
             - ./index:/usr/app
+            - ./index/index_server.py:/usr/app/app.py
             - ./utilities/utilities.py:/usr/app/utilities.py
         depends_on: 
             - mongos
@@ -52,48 +54,48 @@ services:
     #     depends_on: 
     #         - mongos
 
-    extract_worker:
-        container_name: extract_worker
-        build: 
-            context: ./ 
-            dockerfile: extract_worker/Dockerfile
-        image: extract_worker 
-        environment:
-            - ML_MODEL=inception
-            - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
-            - DEDUPLICATE_MODEL=mobilenet
-            - DEDUPLICATE_THRESHOLD=0
-        depends_on: 
-            - rabbitmq
-        ports:
-            - "4000:5000"
-        volumes:
-            - ./extract_worker:/usr/app
-            - ./bucket/bucket.py:/usr/app/bucket.py
-            - ./utilities/utilities.py:/usr/app/utilities.py
-            - ./extractors/extractors.py:/usr/app/extractors.py
+    # extract_worker:
+    #     container_name: extract_worker
+    #     build: 
+    #         context: ./ 
+    #         dockerfile: extract_worker/Dockerfile
+    #     image: extract_worker 
+    #     environment:
+    #         - ML_MODEL=inception
+    #         - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
+    #         - DEDUPLICATE_MODEL=mobilenet
+    #         - DEDUPLICATE_THRESHOLD=0
+    #     depends_on: 
+    #         - rabbitmq
+    #     ports:
+    #         - "4000:5000"
+    #     volumes:
+    #         - ./extract_worker:/usr/app
+    #         - ./bucket/bucket.py:/usr/app/bucket.py
+    #         - ./utilities/utilities.py:/usr/app/utilities.py
+    #         - ./extractors/extractors.py:/usr/app/extractors.py
 
-    rabbitmq:
-        image: "rabbitmq:3-management"
-        ports:
-        - "7672:5672"
-        - "7000:15672"       
-        environment:
-            - RABBITMQ_DEFAULT_USER=admin
-            - RABBITMQ_DEFAULT_PASS=admin
-        volumes:
-        - './rabbitmq_data:/data'
+    # rabbitmq:
+    #     image: "rabbitmq:3-management"
+    #     ports:
+    #     - "7672:5672"
+    #     - "7000:15672"       
+    #     environment:
+    #         - RABBITMQ_DEFAULT_USER=admin
+    #         - RABBITMQ_DEFAULT_PASS=admin
+    #     volumes:
+    #     - './rabbitmq_data:/data'
     
-    rabbitmq_wrapper:
-        container_name: rabbitmq_wrapper
-        image: rabbitmq_wrapper
-        build: 
-            context: ./ 
-            dockerfile: rabbitmq_wrapper/Dockerfile 
-        volumes:
-            - ./rabbitmq_wrapper:/usr/app
-        ports:
-            - "8000:5000"
+    # rabbitmq_wrapper:
+    #     container_name: rabbitmq_wrapper
+    #     image: rabbitmq_wrapper
+    #     build: 
+    #         context: ./ 
+    #         dockerfile: rabbitmq_wrapper/Dockerfile 
+    #     volumes:
+    #         - ./rabbitmq_wrapper:/usr/app
+    #     ports:
+    #         - "8000:5000"
 
     mongos:
         container_name: mongos

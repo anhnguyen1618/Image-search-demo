@@ -1,5 +1,9 @@
 import argparse, requests, os, time
 import mlflow 
+from stats import get_histogram
+
+dataset_dir = "./sample"
+histogram = get_histogram(dataset_dir)
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = ["jpg", "png", "jpeg"]
@@ -14,14 +18,14 @@ def read_dir(dir_path):
 
 def evaluate(results, file_name, num_results, num_relevant):
     true_positive = 0
-    file_name = file_name.split("_")[0]
+    file_name = file_name.split("_image")[0]
     for item in results:
-        original_file_name = item["url"].split("/")[-1].split("_")[0]
+        original_file_name = item["url"].split("/")[-1].split("_image")[0]
         if original_file_name == file_name:
             true_positive += 1
 
     precision = true_positive * 1.0 / num_results
-    recall = true_positive * 1.0 / num_relevant
+    recall = true_positive * 1.0 / histogram.get(file_name, num_results) 
     return precision, recall
 
 
@@ -48,13 +52,15 @@ def benchmark(dir_path, url, model_name, result_size = 7, num_relevant=10, algo 
             sum_precision += precision
             sum_recall += recall
             num_files += 1
+            # print(url, len(res.json()), result_size)
+            # break
             # print(f"{file_name}: {precision}, {recall}")
             # break 
 
         mlflow.log_artifact("./configs/config.json")
         mlflow.log_param("model", model_name)
         mlflow.log_param("result_size", result_size)
-        mlflow.log_param("num_total_relevant", num_relevant)
+        # mlflow.log_param("num_total_relevant", num_relevant)
         mlflow.log_param("algorithm", algo)
         mlflow.log_param("num_index", num_index)
         mlflow.log_param("num_serving", num_serving)
@@ -96,7 +102,7 @@ if __name__ == "__main__":
     num_index = args.index or 1
     num_serving= args.serving or 1
 
-    url = f"{pre_url}&&size={size}"
+    url = f"{pre_url}&size={size}"
     model = url.split("serving")[-1].split("-")[1]
     benchmark(dir_path, url, model, size, num_relevant, algo, num_index, num_serving)
 

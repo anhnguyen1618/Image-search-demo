@@ -26,27 +26,27 @@
       "models": [
         {
           "name": "resnet",
-          "pods": 1 
+          "pods": 0 
         },
         {
           "name": "mobilenet",
-          "pods": 1 
+          "pods": 0
         },
         {
           "name": "custom",
-          "pods": 1
+          "pods": 0
         },
         {
           "name": "vgg16",
-          "pods": 1
+          "pods": 0
         },
         {
           "name": "vgg19",
-          "pods": 1
+          "pods": 0
         },
         {
           "name": "inception",
-          "pods": 1
+          "pods": 0
         }
       ]
     },

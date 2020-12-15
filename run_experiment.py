@@ -3,7 +3,7 @@ import argparse
 
 models = ["resnet", "mobilenet", "custom", "inception", "vgg16", "vgg19"]
 
-result_size = 7
+result_size = 30 
 relevant = 10
 
 parser = argparse.ArgumentParser()

@@ -1,5 +1,6 @@
 import os, json, sys, stat, random, string
 import subprocess
+from service_discovery_prometheus import GenConfig
 
 stage_dir = "./staging"
 main_dir = "./K8s"
@@ -157,56 +158,16 @@ class Nginx(Common_generator):
         file.close()
 
 class Prometheus(Common_generator):
-    def get_services(self):
-        services=["extract-worker", "indexing", "serving"]
-        result = []
-        for service in services:
-            sub_service_names = subprocess.getoutput(f"oc get svc -l service='{service}'" + " -o=jsonpath='{.items[*].metadata.name}'").split(" ")
-            for sub_service in sub_service_names:
-                pod_names = subprocess.getoutput(f"oc get pods -l app={sub_service}" + " -o=jsonpath='{.items[*].metadata.name}'").split(" ")
-                result.append((sub_service, pod_names))
-        return result 
-
-    def gen_content(self):
-        content = ""
-        results = self.get_services()
-        for service_name, pod_names in results:
-            content += f"    - job_name: {service_name}\n      metrics_path: /metrics\n      static_configs:\n        - targets:\n"
-
-            for pod_name in pod_names:
-                content += f"            - '{pod_name}.{service_name}.mongo.svc.cluster.local:5000'\n"
-            content += "\n"
-        return content 
-
-        
-    def gen_config(self):
+    def gen(self, extra_data = None):
         template_file = open(f"{self.template_dir}/prometheus.yml")
-        content = self.gen_content()
-        content = template_file.read().replace("{jobs}", content).replace("{num_pods}", str(self.data["pods"]))
+        content = template_file.read().replace("{num_pods}", str(self.data["pods"]))
         file_path = f"{self.out_dir}/prometheus.yml"
         file = open(file_path, "w") 
         file.write(content) 
-        file.close() 
-    
-    # def build_docker_img(self):
-    #     execute(f"cp {self.template_dir}/Dockerfile-prometheus staging")
-    #     os.chdir("staging")
-    #     execute("docker build -t eu.gcr.io/gothic-module-289816/prometheus:latest . -f Dockerfile-prometheus")
-    #     execute("docker push eu.gcr.io/gothic-module-289816/prometheus:latest")
-    #     execute("rm Dockerfile-prometheus")
-    #     execute("rm prometheus_config.yml")
-    #     execute("rm alert.yml")
-    #     os.chdir("..")
-    
-    # def gen_yml(self):
-    #     template_file = open(f"{self.template_dir}/prometheus.yml")
-    #     content = template_file.read().replace("{num_pods}", str(self.data["pods"]).replace("{num_random}", random.choice(string.ascii_letters)))
-    #     file = open(f"{self.out_dir}/prometheus.yml", "w") 
-    #     file.write(content) 
-    #     file.close()
+        file.close()
 
-    def gen(self, extra_data = None):
-        self.gen_config()
+        config_gen=GenConfig()
+        config_gen.gen()
         # self.build_docker_img()
         # self.gen_yml()
 

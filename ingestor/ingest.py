@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
     ingestor = Ingestor(BUCKET_NAME, RABBITMQ_URL, QUEUE_NAME)
     # data_dir = "../dataset"
-    data_dir = "../dataset-10"
-    # data_dir = "../sample"
+    # data_dir = "../dataset-10"
+    data_dir = "../sample"
     # data_dir = "../test"
     ingestor.upload_folder(data_dir)

@@ -56,7 +56,7 @@ def search():
     if not index:
         load_index()
          
-    results = index.query(request.get_json(), n_neighbors=10)
+    results = index.query(request.get_json(), size=size)
     return json.dumps(results)
 
 @app.route("/metrics")
