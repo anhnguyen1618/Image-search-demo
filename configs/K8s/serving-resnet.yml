@@ -19,7 +19,7 @@ kind: Deployment
 metadata:
   name: serving-resnet
 spec:
-  replicas: 20 
+  replicas: 1 
   strategy:
     type: RollingUpdate
     rollingUpdate:

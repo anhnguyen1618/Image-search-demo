@@ -33,7 +33,7 @@ def save_file(file):
     file.save(file_path)
     return file_path
 
-async def aggregate(payload, res):
+async def aggregate(payload, res, size = 10):
     # res = requests.post(INDEX_URL+"/search", json=payload)
     results = []
     loop = asyncio.get_event_loop()
@@ -41,7 +41,7 @@ async def aggregate(payload, res):
         loop.run_in_executor(
             None, 
             requests.post,
-            f"{INDEX_URL}-{index}:{PORT}/search",
+            f"{INDEX_URL}-{index}:{PORT}/search?size={size}",
             None,
             payload
         )
@@ -49,7 +49,8 @@ async def aggregate(payload, res):
     ]
     for response in await asyncio.gather(*futures):
         if response.status_code != 200:
-            logger.error(f"Error fetching results from {response.url}")
+            print("Error")
+            # logger.error(f"Error fetching results from {response.url}")
             continue
 
         results += response.json()
@@ -71,7 +72,7 @@ observer = Observer()
 def search_from_index(payload, num_records=5):
     loop = asyncio.new_event_loop()
     res = {"results":[]}
-    loop.run_until_complete(aggregate(payload, res))
+    loop.run_until_complete(aggregate(payload, res, num_records))
     res["results"].sort(key=lambda x: x["distance"])
     return res["results"][:num_records]
 
@@ -84,9 +85,7 @@ def index():
 @observer.request_time.time()
 def search():
     use_json = request.args.get('json', type=bool)
-    if use_json:
-        payload = request.get_json()
-        return json.dumps(search_from_index(payload)) 
+    size= request.args.get('size', type=int) or 10
 
     if request.files and request.files['record'] and allowed_file(request.files['record'].filename): 
         file = request.files['record']
@@ -94,10 +93,9 @@ def search():
         feature_vector = extract_features(path, model)
         payload = feature_vector.tolist()
 
-        results = search_from_index(payload) 
+        results = search_from_index(payload, size) 
 
-        return render_template("index.html", results = results)
-        # return res.content
+        return json.dumps(results) if use_json else render_template("index.html", results = results)
     
     return "file format is not acceptable", 500
 

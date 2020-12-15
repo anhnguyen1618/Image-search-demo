@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: indexing-resnet-1 
+  name: indexing-inception-1 
   labels:
     service: indexing
 
 spec:
   selector:
-    app: indexing-resnet-1 
+    app: indexing-inception-1 
   ports:
   - protocol: "TCP"
     port: 5000
@@ -18,7 +18,7 @@ spec:
 apiVersion: apps/v1 
 kind: Deployment 
 metadata:
-  name: indexing-resnet-1 
+  name: indexing-inception-1 
 spec:
   replicas: 1
   strategy:
@@ -28,15 +28,15 @@ spec:
       maxSurge: 100%
   selector:
     matchLabels:
-      app: indexing-resnet-1 
+      app: indexing-inception-1 
   template:
     metadata:
       labels:
-        app: indexing-resnet-1 
+        app: indexing-inception-1 
         service: indexing
     spec:
       containers:
-      - name: indexing-resnet-1 
+      - name: indexing-inception-1 
         image: eu.gcr.io/gothic-module-289816/indexing:latest
         imagePullPolicy: Always 
         ports:
@@ -50,7 +50,7 @@ spec:
         - name: CURRENT_INDEX 
           value: "1"
         - name: ML_MODEL 
-          value: "resnet" 
+          value: "inception" 
         - name: MODEL_URL 
           value: "" 
         - name: INDEX_ALGORITHM

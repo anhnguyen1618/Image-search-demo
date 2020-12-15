@@ -4,9 +4,16 @@
       "name": "resnet"
     },
     {
-      "name": "mobilenet",
-      "deduplicate": true,
-      "threshold": 0.0
+      "name": "vgg16"
+    },
+    {
+      "name": "vgg19"
+    },
+    {
+      "name": "inception"
+    },
+    {
+      "name": "mobilenet"
     },
     {
       "name": "custom",
@@ -28,6 +35,18 @@
         {
           "name": "custom",
           "pods": 1
+        },
+        {
+          "name": "vgg16",
+          "pods": 1
+        },
+        {
+          "name": "vgg19",
+          "pods": 1
+        },
+        {
+          "name": "inception",
+          "pods": 1
         }
       ]
     },
@@ -37,7 +56,7 @@
         {
           "name": "resnet",
           "num_indexes": 1,
-          "pods": 5,
+          "pods": 1,
           "index_algorithm": "brute"
         },
         {
@@ -49,6 +68,21 @@
           "name": "custom",
           "num_indexes": 1,
           "pods": 1
+        },
+        {
+          "name": "vgg16",
+          "num_indexes": 1,
+          "pods": 1
+        },
+        {
+          "name": "vgg19",
+          "num_indexes": 1,
+          "pods": 1
+        },
+        {
+          "name": "inception",
+          "num_indexes": 1,
+          "pods": 1
         }
       ]
     },
@@ -57,7 +91,7 @@
       "models": [
         {
           "name": "resnet",
-          "pods": 20 
+          "pods": 1 
         },
         {
           "name": "mobilenet",
@@ -66,6 +100,18 @@
         {
           "name": "custom",
           "pods": 1 
+        },
+        {
+          "name": "vgg16",
+          "pods": 1
+        },
+        {
+          "name": "vgg19",
+          "pods": 1
+        },
+        {
+          "name": "inception",
+          "pods": 1
         }
       ] 
     },

@@ -11,4 +11,4 @@ COPY ./utilities/utilities.py utilities.py
 
 EXPOSE 5000
 
-CMD ["gunicorn" , "--workers=4", "--worker-class=gevent", "--worker-connections=1000", "--bind", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn" , "--workers=1", "--worker-class=gevent", "--worker-connections=4000", "--bind", "0.0.0.0:5000", "app:app"]

@@ -71,11 +71,6 @@ def model_picker(name, model_url = ""):
                          include_top=False,
                          input_shape=(224, 224, 3),
                         pooling='max')
-    elif (name == 'xception'):
-        model = Xception(weights='imagenet',
-                         include_top=False,
-                         input_shape=(224, 224, 3),
-                         pooling='max')
     else:
         pass
         # logger.error("Specified model not available")

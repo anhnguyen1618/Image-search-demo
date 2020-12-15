@@ -39,7 +39,8 @@ def hello():
 @observer.request_time.time()
 def reindex():
     global index
-    index = Index(mongo_address, model_name, TOTAL_NUM_INDEXES, CURRENT_INDEX, algorithm = index_algorithm)
+    size= request.args.get('size', type=int) or 10
+    index = Index(mongo_address, model_name, TOTAL_NUM_INDEXES, CURRENT_INDEX, algorithm = index_algorithm, n_neighbors=size)
     msg = f"Done indexing {len(index.records)}"
     observer.index_gauge.set(len(index.records))
     return msg 
@@ -48,7 +49,8 @@ def reindex():
 @observer.failure_count.count_exceptions()
 @observer.search_time.time()
 def search():
-    results = index.query(request.get_json())
+    size= request.args.get('size', type=int) or 10
+    results = index.query(request.get_json(), n_neighbors=10)
     return json.dumps(results)
 
 @app.route("/metrics")

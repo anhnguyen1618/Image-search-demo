@@ -21,8 +21,10 @@
             </form>
 
             {% for item in results %}
-                <img src={{ item["url"] }} height="300px" />
-                <text>{{item["score"]}} </text>
+                <div>
+                    <img src={{ item["url"] }} height="300px" />
+                    <text>{{item["distance"]}} </text>
+                </div>
             {% endfor %}
         </div>
     </div>

@@ -43,10 +43,10 @@ spec:
           value: "mobilenet"
         - name: MODEL_URL
           value: ""
-        - name: DEDUPLICATE_MODEL
-          value: "mobilenet"
-        - name: DEDUPLICATE_THRESHOLD
-          value: "0"
+        # - name: DEDUPLICATE_MODEL
+        #   value: "{deduplicate_model}"
+        # - name: DEDUPLICATE_THRESHOLD
+        #   value: "{deduplicate_threshold}"
       volumes:
         - name: myclaim 
           persistentVolumeClaim:

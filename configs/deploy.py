@@ -15,7 +15,7 @@ class Common_generator:
         print(f"Service {self.data['name']} generator is missing")
 
 class Extract_worker(Common_generator):
-    def gen_from_template(self, model_name, num_pods, deduplicate_model, deduplicate_threshold, model_url = ""):
+    def gen_from_template(self, model_name, num_pods, model_url = ""):
         template_file = open(f"{self.template_dir}/extract_worker.yml")
         template_content = template_file.read()
 
@@ -24,32 +24,29 @@ class Extract_worker(Common_generator):
             .replace("{model}", model_name)
             .replace("{model_url}", model_url)
             .replace("{num_pods}", str(num_pods))
-            .replace("{deduplicate_model}", str(deduplicate_model))
-            .replace("{deduplicate_threshold}", str(deduplicate_threshold))
             )
         file = open(f"{self.out_dir}/extract_worker-{model_name}.yml", "w") 
         file.write(content) 
         file.close()  
     
-    def extract_deduplicate_info(self):
-        models = self.data["models"]
-        print(models)
-        if len(models) == 1:
-            return {"model": models[0]["name"], "threshold": models[0].get("deduplicate_threshold", 0)}
+    # def extract_deduplicate_info(self):
+    #     models = self.data["models"]
+    #     print(models)
+    #     if len(models) == 1:
+    #         return {"model": models[0]["name"], "threshold": models[0].get("deduplicate_threshold", 0)}
 
-        for _, model in self.model_meta.items():
-            if model.get("deduplicate", False):
-                return {"model": model["name"], "threshold": model.get("deduplicate_threshold", 0)}
+    #     for _, model in self.model_meta.items():
+    #         if model.get("deduplicate", False):
+    #             return {"model": model["name"], "threshold": model.get("deduplicate_threshold", 0)}
 
-        raise Exception("It is required to specify deduplicate model")
+    #     raise Exception("It is required to specify deduplicate model")
 
 
     def gen(self, extra_data = None):
-        deduplicate_info = self.extract_deduplicate_info()
         for model in self.data["models"]:
             model_name = model["name"]
             model_url = self.model_meta.get(model_name, {}).get("model_url", "") 
-            self.gen_from_template(model_name, model["pods"], deduplicate_info["model"], deduplicate_info["threshold"], model_url)
+            self.gen_from_template(model_name, model["pods"], model_url)
 
 class Indexing(Common_generator):
     def gen_from_template(self, model_name, num_indexes, num_pods, index_algorithm = "brute", model_url = ""):
