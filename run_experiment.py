@@ -14,7 +14,7 @@ parser.add_argument("-se", "--serving", type=int, help="num serving")
 args = parser.parse_args()
 
 algorithm = args.algo or "brute"
-index = args.index or 1
+num_index = args.index or 1
 num_serving = args.serving or 1
 
 def gen_command(model):

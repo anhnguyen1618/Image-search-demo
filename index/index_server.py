@@ -30,6 +30,10 @@ class Observer:
 
 observer = Observer()
 
+def load_index(size = 10):
+    global index
+    index = Index(mongo_address, model_name, TOTAL_NUM_INDEXES, CURRENT_INDEX, algorithm = index_algorithm, n_neighbors=size)
+
 @app.route("/")
 def hello():
     return "tests"
@@ -38,11 +42,10 @@ def hello():
 @observer.failure_count.count_exceptions()
 @observer.request_time.time()
 def reindex():
-    global index
     size= request.args.get('size', type=int) or 10
-    index = Index(mongo_address, model_name, TOTAL_NUM_INDEXES, CURRENT_INDEX, algorithm = index_algorithm, n_neighbors=size)
-    msg = f"Done indexing {len(index.records)}"
+    load_index(size)
     observer.index_gauge.set(len(index.records))
+    msg = f"Done indexing {len(index.records)}"
     return msg 
 
 @app.route("/search", methods=["POST"])
@@ -50,6 +53,9 @@ def reindex():
 @observer.search_time.time()
 def search():
     size= request.args.get('size', type=int) or 10
+    if not index:
+        load_index()
+         
     results = index.query(request.get_json(), n_neighbors=10)
     return json.dumps(results)
 

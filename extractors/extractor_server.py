@@ -6,7 +6,7 @@ import prometheus_client
 from prometheus_client import start_http_server, Summary, Counter
 from utilities import Logger
 
-# logger = Logger()
+logger = Logger()
 TOTAL_NUM_INDEXES = int(os.getenv('TOTAL_NUM_INDEXES', 1))
 ML_MODEL = os.getenv('ML_MODEL', "resnet")
 

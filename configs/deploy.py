@@ -361,10 +361,11 @@ class Generator:
         return self.generator_mappings.get(data["name"], Common_generator)(data, self.model_meta)
 
 def execute(cmd):
-    commands = cmd.split("&&")
-    for cmd in commands:
-        cmd = cmd.strip()
-        subprocess.run(cmd.split(" "))
+    subprocess.run(cmd, shell=True)
+    # commands = cmd.split("&&")
+    # for cmd in commands:
+    #     cmd = cmd.strip()
+    #     subprocess.run(cmd.split(" "))
 
 
 def clean_and_apply():
@@ -378,6 +379,7 @@ def clean_and_apply():
     # execute("./build-docker-img.sh")
     # os.chdir("configs")
     execute(f"rm -r {main_dir} && mv {stage_dir} {main_dir} && mkdir {stage_dir}  && oc apply -f {main_dir}")
+    execute("oc exec -it $(oc get pod -l app=prometheus -o=jsonpath='{.items[*].metadata.name}') -- sh -c 'kill -HUP 1'")
     execute("sh expose.sh")
     os.chdir(main_dir)
     execute("bash mongo_config_db.sh")

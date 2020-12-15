@@ -18,24 +18,24 @@ from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.layers import Input, Flatten, Dense, Dropout, GlobalAveragePooling2D
 from utilities import Logger
 
-# logger = Logger()
+logger = Logger()
 
 def download_model(model_url):
     file_name = model_url.rsplit('/', 1)[1] if model_url.find('/') else ""
     path_dir = f"./tmp/{file_name}"
     if os.path.isfile(path_dir):
-        print(f"File already exist. Load file from {path_dir}")
+        logger.info(f"File already exist. Load file from {path_dir}")
         return path_dir
 
-    print(f"Start downloading model at {model_url}")
+    logger.info(f"Start downloading model at {model_url}")
     r = requests.get(model_url, allow_redirects=True)
-    print(f"Writing model to dir {path_dir}")
+    logger.info(f"Writing model to dir {path_dir}")
     open(path_dir, 'wb').write(r.content)
-    print("Done writing model!!!")
+    logger.info("Done writing model!!!")
     return path_dir
 
 def model_picker(name, model_url = ""):
-    # logger.info(f"Picking model {name} with custom url({model_url})")
+    logger.info(f"Picking model {name} with custom url({model_url})")
     if model_url:
         if model_url[0] == "\"":
             model_url = model_url[1:-1]
@@ -72,8 +72,7 @@ def model_picker(name, model_url = ""):
                          input_shape=(224, 224, 3),
                         pooling='max')
     else:
-        pass
-        # logger.error("Specified model not available")
+        logger.error("Specified model not available")
     return model
 
 
