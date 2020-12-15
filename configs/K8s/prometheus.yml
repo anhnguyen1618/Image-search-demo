@@ -110,37 +110,37 @@ data:
       metrics_path: /metrics
       static_configs:
         - targets:
-            - '.indexing-custom-1.mongo.svc.cluster.local:5000'
+            - 'indexing-custom-1-79bb949578-hcdgv.indexing-custom-1.mongo.svc.cluster.local:5000'
 
     - job_name: indexing-inception-1
       metrics_path: /metrics
       static_configs:
         - targets:
-            - 'indexing-inception-1-756994568f-nmnwx.indexing-inception-1.mongo.svc.cluster.local:5000'
+            - 'indexing-inception-1-756994568f-9dfkq.indexing-inception-1.mongo.svc.cluster.local:5000'
 
     - job_name: indexing-mobilenet-1
       metrics_path: /metrics
       static_configs:
         - targets:
-            - '.indexing-mobilenet-1.mongo.svc.cluster.local:5000'
+            - 'indexing-mobilenet-1-6c776fc887-4sdlh.indexing-mobilenet-1.mongo.svc.cluster.local:5000'
 
     - job_name: indexing-resnet-1
       metrics_path: /metrics
       static_configs:
         - targets:
-            - '.indexing-resnet-1.mongo.svc.cluster.local:5000'
+            - 'indexing-resnet-1-d5cf5f8bf-hsdqg.indexing-resnet-1.mongo.svc.cluster.local:5000'
 
     - job_name: indexing-vgg16-1
       metrics_path: /metrics
       static_configs:
         - targets:
-            - '.indexing-vgg16-1.mongo.svc.cluster.local:5000'
+            - 'indexing-vgg16-1-567454d85c-bxv6z.indexing-vgg16-1.mongo.svc.cluster.local:5000'
 
     - job_name: indexing-vgg19-1
       metrics_path: /metrics
       static_configs:
         - targets:
-            - '.indexing-vgg19-1.mongo.svc.cluster.local:5000'
+            - 'indexing-vgg19-1-65f98bf664-c9jrn.indexing-vgg19-1.mongo.svc.cluster.local:5000'
 
     - job_name: serving-custom
       metrics_path: /metrics

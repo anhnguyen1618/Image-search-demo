@@ -54,7 +54,7 @@ spec:
         - name: MODEL_URL 
           value: "https://storage.googleapis.com/images-search/model-finetuned.h5" 
         - name: INDEX_ALGORITHM
-          value: "brute"
+          value: "kd_tree"
       volumes:
         - name: myclaim 
           persistentVolumeClaim:

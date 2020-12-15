@@ -54,7 +54,7 @@ spec:
         - name: MODEL_URL 
           value: "" 
         - name: INDEX_ALGORITHM
-          value: "brute"
+          value: "kd_tree"
       volumes:
         - name: myclaim 
           persistentVolumeClaim:

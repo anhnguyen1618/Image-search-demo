@@ -1,0 +1,4 @@
+artifact_location: file:///home/zozo/elastic-img-search/mlruns/1
+experiment_id: '1'
+lifecycle_stage: active
+name: kdtree-1-index-1-serving
