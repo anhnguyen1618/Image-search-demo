@@ -1,0 +1,4 @@
+artifact_location: file:///home/zozo/elastic-img-search/mlruns/0
+experiment_id: '0'
+lifecycle_stage: active
+name: image-search

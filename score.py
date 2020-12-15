@@ -1,4 +1,5 @@
 import argparse, requests, os, time
+import mlflow 
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = ["jpg", "png", "jpeg"]
@@ -11,11 +12,8 @@ def read_dir(dir_path):
         if allowed_file(file)
     ]
 
-def evaluate(results, file_name):
-    print(results)
+def evaluate(results, file_name, num_results, num_relevant):
     true_positive = 0
-    num_relevant = 10 
-    num_results = 7 
     file_name = file_name.split("_")[0]
     for item in results:
         original_file_name = item["url"].split("/")[-1].split("_")[0]
@@ -27,39 +25,66 @@ def evaluate(results, file_name):
     return precision, recall
 
 
+def benchmark(dir_path, url, model_name, result_size = 7, num_relevant=10):
+    with mlflow.start_run():
+        sum_precision = 0
+        sum_recall = 0
+
+        file_names = read_dir(dir_path)
+        num_files = 0 
+        duration = 0
+        experiment_start_time = time.time()
+        for file_name in file_names:
+            files = {'record': open(f"{dir_path}/{file_name}",'rb')}
+            
+            start = time.time()
+            res = requests.post(url, files=files)
+            duration += time.time() - start
+            if res.status_code != 200:
+                print("Error ", url, file_name, res.reason)
+                continue
+            # print(res.status_code, file_name, res.reason)
+            precision, recall = evaluate(res.json(), file_name, result_size, num_relevant)
+            sum_precision += precision
+            sum_recall += recall
+            num_files += 1
+            # print(f"{file_name}: {precision}, {recall}")
+            # break 
+
+        mlflow.log_param("model", model_name)
+        mlflow.log_param("result_size", result_size)
+        mlflow.log_param("num_total_relevant", num_relevant)
+        precision = sum_precision / num_files 
+        recall = sum_recall / num_files
+        avg_duration = duration / num_files
+
+        experiment_duration = time.time() - experiment_start_time
+
+        mlflow.log_metric("precision", precision)
+        mlflow.log_metric("recall", recall)
+        mlflow.log_metric("avg_duration_per_request", avg_duration)
+        mlflow.log_metric("total_test", num_files)
+        mlflow.log_metric("experiment_duration", experiment_duration)
+
+        print(f"url: {url}") 
+        print(f"Precision: {precision}, Recall: {recall}, Avg duration: {avg_duration} s/req")
 
 
-def benchmark(dir_path, url):
-    sum_precision = 0
-    sum_recall = 0
 
-    file_names = read_dir(dir_path)
-    num_files = len(file_names)
-    duration = 0
-    for file_name in file_names:
-        files = {'record': open(f"{dir_path}/{file_name}",'rb')}
-        
-        start = time.time()
-        res = requests.post(url, files=files)
-        duration += time.time() - start
-        print(res.status_code, file_name, res.reason)
-        precision, recall = evaluate(res.json(), file_name)
-        sum_precision += precision
-        sum_recall += recall
-        print(f"{file_name}: {precision}, {recall}")
-
-    print(f"url: {url}") 
-    print(f"Precision: {sum_precision / num_files}, Recall: {sum_recall / num_files}, Avg duration: {duration / num_files} s/req")
-    print("---------------------------")
-
-
-parser = argparse.ArgumentParser()
-parser.add_argument("-d", "--dir", type=str, help="dataset dir to calculate precision/recall")
-parser.add_argument("-u", "--url", type=str, help="url to test")
-args = parser.parse_args()
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", "--dir", type=str, help="dataset dir to calculate precision/recall")
+    parser.add_argument("-u", "--url", type=str, help="url to test")
+    parser.add_argument("-s", "--size", type=int, help="result size")
+    parser.add_argument("-r", "--relevant", type=int, help="num relevant in db")
+    args = parser.parse_args()
+
     dir_path = args.dir or "./dataset"
-    url = args.url or "http://serving-custom-mongo.rahtiapp.fi/search?json=true&&size=7"
-    benchmark(dir_path, url)
+    pre_url = args.url or "http://serving-mobilenet-mongo.rahtiapp.fi/search?json=true"
+    size = args.size or 7
+    num_relevant = args.relevant or 10
+    url = f"{pre_url}&&size={size}"
+    model = url.split("serving")[-1].split("-")[1]
+    benchmark(dir_path, url, model, size, num_relevant)
 
