@@ -25,7 +25,7 @@ def evaluate(results, file_name, num_results, num_relevant):
     return precision, recall
 
 
-def benchmark(dir_path, url, model_name, result_size = 7, num_relevant=10):
+def benchmark(dir_path, url, model_name, result_size = 7, num_relevant=10, algo = "bruteforce", num_index = 1, num_serving = 1):
     with mlflow.start_run():
         sum_precision = 0
         sum_recall = 0
@@ -51,9 +51,14 @@ def benchmark(dir_path, url, model_name, result_size = 7, num_relevant=10):
             # print(f"{file_name}: {precision}, {recall}")
             # break 
 
+        mlflow.log_artifact("./configs/config.json")
         mlflow.log_param("model", model_name)
         mlflow.log_param("result_size", result_size)
         mlflow.log_param("num_total_relevant", num_relevant)
+        mlflow.log_param("algorithm", algo)
+        mlflow.log_param("num_index", num_index)
+        mlflow.log_param("num_serving", num_serving)
+
         precision = sum_precision / num_files 
         recall = sum_recall / num_files
         avg_duration = duration / num_files
@@ -78,13 +83,20 @@ if __name__ == "__main__":
     parser.add_argument("-u", "--url", type=str, help="url to test")
     parser.add_argument("-s", "--size", type=int, help="result size")
     parser.add_argument("-r", "--relevant", type=int, help="num relevant in db")
+    parser.add_argument("-a", "--algo", type=str, help="clustering algorithm")
+    parser.add_argument("-i", "--index", type=int, help="num index")
+    parser.add_argument("-se", "--serving", type=int, help="num serving")
     args = parser.parse_args()
 
     dir_path = args.dir or "./dataset"
     pre_url = args.url or "http://serving-mobilenet-mongo.rahtiapp.fi/search?json=true"
     size = args.size or 7
     num_relevant = args.relevant or 10
+    algo = args.algo or "bruteforce"
+    num_index = args.index or 1
+    num_serving= args.serving or 1
+
     url = f"{pre_url}&&size={size}"
     model = url.split("serving")[-1].split("-")[1]
-    benchmark(dir_path, url, model, size, num_relevant)
+    benchmark(dir_path, url, model, size, num_relevant, algo, num_index, num_serving)
 

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/zozo/elastic-img-search/mlruns/0/b99f542e1ffc416abb689d579bf8d46f/artifacts
+end_time: 1608049000019
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+name: ''
+run_id: b99f542e1ffc416abb689d579bf8d46f
+run_uuid: b99f542e1ffc416abb689d579bf8d46f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1608048748310
+status: 3
+tags: []
+user_id: zozo
