@@ -197,21 +197,31 @@ There are 2 parts of the whole process:
 
 * Each index server receives request and find the top X results that are closed to the query vector and return the score, image url to the web-server. This step can be solved using either bruteforce or hierachical clustering such as `Kdd_tree`. The web server then gather the results of each index, aggregate the results to generate the final X results.
 
-## Scalability:
-* This system is horizontally scalable by adding more pods to distribute the load. However, the hardest problem comes from the part that need vertically scaling. For example, if the search request take 1s in total, 0.8-0.9s are spent on converting image to vector and the rest for networking + search. In this particular demo, we also have constraints in the total number of CPU for each pod (1.6 vCPU). Hence, each server pod can barely handle 1 request at a time and it consumes 6Gb of Ram and 1.6 CPU just to handle 1 request. Therefore, the system can only be scaled by adding more pods (the maximum quota is 50 but we need around 20 to run other services which leaves the remaining 30 for web-server)
-### Potential solutions:
-* A better architecture: Using serverless (AWS Lambda, Google Cloud Function) which spin up container for each request to scale up and down in an inexpensive way.
-* Perhaps using GPU or higher-frequency CPU could help to handle more request. But then, we have to copy the memory back and forth from CPU to GPU which introduces overhead.
-* Use model that are less expensive (for example, `mobilenet` is 6-7 times faster than `Vgg-16` or 2-3 times faster than `resnet`) but provide lower accuracy as a tradeoff.
-* I would love to discuss more on this topic.
+# Problems:
 
-## Elasticity:
-* The system is built with micro-services connecting to each other via message broker and rest api. Which is quite flexible in terms of change in each component. Adding new Tensorflow models requires adding url of the model in the config file, change a few parameters, reconverting images to new feature vectors, then dumb to db, index and serve. With the help of Load balancers and Kubernetes, we can change model in roll-out fashion.
+## Scalability:
+* This system is horizontally scalable by adding more pods to distribute the load. However, the hardest problem at this scale comes from the part that needs vertical scaling. For example, if the search request take 1s in total, 0.8-0.9s are spent on converting image to vector and the rest for networking + search. In this particular demo, we also have constraints in the total number of CPU for each pod (1.6 vCPU). Hence, each server pod can barely handle 1 request at a time and it consumes 6Gb of Ram and 1.6 CPU just to handle 1 concurrent request for some large models(vgg19). The engineering mistake that I made here is that I put the logic for model computing, which is CPU-bound in this demo in the webserver. This seriously chokes the server due to the Global Intepreter Lock(GIL) in python. To mitigate the problem with GIL, multiprocessing(spawned new processes to handle concurrent requests) is used to alleviate the problem (Unfortunately, we have the quota of 1.6 vCPU, which doesn't bring much improvement in this case). Therefore, the system can only be scaled by adding more pods (the maximum quota is 50 but we need around 20 to run other services which leaves the remaining 30 for web-server)
+### Potential solutions:
+1. Using `gunicorn` web servers to spawn workers. Using threads, gevent doesn't help much with the CPU-bound task here due to Python GIL, adding more processes can circumvent the GIL problem. More information [here](https://medium.com/building-the-system/gunicorn-3-means-of-concurrency-efbb547674b7).
+
+Adding the additional worker does help increasing throughput slightly. However, it does add complexity when dealing with memory since each process has its own memory space. For example, imagine that you have to send a request to a service A at `http://a.fi/load-index` to update the data in memory of the server. However, there are 2 servers(processes) that stand behind the load balancer at `http://a.fi/load-index` and your request is routed to the first server, leaving the data in the second server staled. This is exactly the bug that I had when trying to update memory of the index server(2 gunicorn worker processes).
+
+2. A better architecture: Using serverless (AWS Lambda, Google Cloud Function) which spin up container for each request in order to convert the image to feature vector since it takes roughly a few seconds at most for processing 1 image. In the python web server, we use gthread of unicorn in order to send request to the serverless function since it is lightweight so it can handle I/O task well. This approach allows us to handle more concurrent requests with the web server while the expensive computation is handled by the cloud function. 
+
+3.Perhaps using GPU or higher-frequency CPU could help to processing image with ML model faster. 
+
+4. Use model that are less expensive (for example, `mobilenet` is 6-7 times faster than `Vgg-16` or 2-3 times faster than `resnet`) but provide lower accuracy as a tradeoff(decreasing precision by half).
 
 ## Resiliency:
 * System resiliency can be achieve by monitoring and logging to detect bottlenecks (the web server in this case). Kubernetes allows certain level of availability by restarting pod if it crashes. Unfortunately, The auto scaler of Openshift Rahti cloud doesn't work at all so we need to develop some sorts of monitoring and autoscaler by ourselves.
-* However, the problem with the system is that there is no deduplication in the system. This could cause the problem because no one wants to look for an image and discover 100 identical images. I have thought about this problem and an initial solution is to deduplicate at the time of ingestion. However, it is hard to do in the context of distributed system. Hence, one solution is probably running an Airflow job that pull the data from db and perform deduplication. It could works since it doesn't disturb the main flow of the data since we don't read db that often thanks to the indexing.
+* However, the problem with the system is that there is no deduplication mechanism in the system. This could cause the problem because no one wants to look for an image and discover 100 identical images.
+### Potential solutions:
+* I have thought about this problem and an initial solution is to deduplicate at the time of ingestion. However, it is hard to do in the context of distributed system (multiple workers can process duplicated images at the same time and insert to db without knowing each other). Hence, one solution is probably running an Airflow job that pull the data from db and perform deduplication. This approach could work since it doesn't disturb the main flow of the data as we don't read db that often thanks to the in-memory indexing.
 
+## Other minor issues:
+* Openshift doesn't allow external traffic going to Rabbitmq and Mongodb directly. The workarounds is to interact with Rabbitmq and Mongodb from internal service or expose a wrapper HTTP server to interact with those services. For example, I added a server just to send message from external to Rabbitmq.
+* You need to mount Persistent volume to container to write file in container even if those files are just temporary. This could be problematic for applications that need to write config file to some locations that already contains other configuration files. This means that if you mount the volume there, all other existing configuration files don't exist at execution time.
+* Normal users don't have permission to create Cluster Admin RBAC in CSC. This could be a problem for service discovery such as when running `prometheus`. The workaround is to extract Kubernetes data from outside, generate `ConfigMap` to mount into the container.  
 
-
-
+## Elasticity:
+* The system is built with micro-services connecting to each other via message broker and rest api. Which is quite flexible in terms of change in each component. Adding new Tensorflow models requires adding url of the model in the config file, change a few parameters, reconverting images to new feature vectors, then dumb to db, index and serve. With the help of Load balancers and Kubernetes, we can change model in roll-out fashion.
