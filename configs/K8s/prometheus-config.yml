@@ -124,39 +124,35 @@ data:
       metrics_path: /metrics
       static_configs:
         - targets:
-            - 'serving-custom-767d6474c6-8qnvv.serving-custom.mongo.svc.cluster.local:5000'
             - 'serving-custom-869664bbcc-5s7j7.serving-custom.mongo.svc.cluster.local:5000'
 
     - job_name: serving-inception
       metrics_path: /metrics
       static_configs:
         - targets:
-            - 'serving-inception-7d55766cff-rjttv.serving-inception.mongo.svc.cluster.local:5000'
-            - 'serving-inception-f64758566-9ztzl.serving-inception.mongo.svc.cluster.local:5000'
+            - 'serving-inception-f64758566-8vmtb.serving-inception.mongo.svc.cluster.local:5000'
 
     - job_name: serving-mobilenet
       metrics_path: /metrics
       static_configs:
         - targets:
-            - 'serving-mobilenet-556957cc7-g5wfx.serving-mobilenet.mongo.svc.cluster.local:5000'
-            - 'serving-mobilenet-dd446cb76-45cpg.serving-mobilenet.mongo.svc.cluster.local:5000'
+            - 'serving-mobilenet-dd446cb76-9bbfc.serving-mobilenet.mongo.svc.cluster.local:5000'
 
     - job_name: serving-resnet
       metrics_path: /metrics
       static_configs:
         - targets:
-            - 'serving-resnet-5675c74456-6f7fw.serving-resnet.mongo.svc.cluster.local:5000'
+            - 'serving-resnet-5675c74456-h286t.serving-resnet.mongo.svc.cluster.local:5000'
 
     - job_name: serving-vgg16
       metrics_path: /metrics
       static_configs:
         - targets:
-            - 'serving-vgg16-849778f6b-tdzgz.serving-vgg16.mongo.svc.cluster.local:5000'
+            - 'serving-vgg16-849778f6b-fqhfm.serving-vgg16.mongo.svc.cluster.local:5000'
 
     - job_name: serving-vgg19
       metrics_path: /metrics
       static_configs:
         - targets:
-            - 'serving-vgg19-55d58cddb4-jdrp4.serving-vgg19.mongo.svc.cluster.local:5000'
             - 'serving-vgg19-6477cc68fc-zvhbv.serving-vgg19.mongo.svc.cluster.local:5000'
 

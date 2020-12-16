@@ -26,18 +26,10 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def save_file(file):
-    file = request.files['record']
-    file_name = str(uuid.uuid1()) + "." + file.filename.rsplit('.', 1)[1].lower()
-    file_path = os.path.join(FILE_UPLOAD_DIR, file_name)
-    file.save(file_path)
-    return file_path
-
 async def aggregate(payload, res, size = 10):
     # res = requests.post(INDEX_URL+"/search", json=payload)
     results = []
     loop = asyncio.get_event_loop()
-    logger.error(size)
     futures = [
         loop.run_in_executor(
             None, 
@@ -61,23 +53,35 @@ async def aggregate(payload, res, size = 10):
 class Observer:
     def __init__(self):
         self.request_time = Summary('serving_processing_duration', 'Time spent indexing')
-        self.failure_count = Counter('num_of_exception', 'Number of exception')
+        self.failure_count = Counter('serving_num_of_exception', 'Number of exception')
         self.search_time = Summary("serving_search_duration", "Time spent in searching")
+        self.save_file_time= Summary("serving_save_file_duration", "Time spent in saving file")
+        self.eval_model_time= Summary("serving_eval_model_duration", "Time spent in saving file")
 
     def gen_report(self):
-        return [ prometheus_client.generate_latest(v) for v in [self.request_time, self.failure_count, self.search_time] ]
+        return [ prometheus_client.generate_latest(v) for v in [self.request_time, self.failure_count, self.search_time, self.save_file_time, self.eval_model_time] ]
 
 observer = Observer()
 
+@observer.save_file_time.time()
+def save_file(file):
+    file = request.files['record']
+    file_name = str(uuid.uuid1()) + "." + file.filename.rsplit('.', 1)[1].lower()
+    file_path = os.path.join(FILE_UPLOAD_DIR, file_name)
+    file.save(file_path)
+    return file_path
+
 @observer.search_time.time()
 def search_from_index(payload, num_records=15):
-
-    logger.error(num_records)
     loop = asyncio.new_event_loop()
     res = {"results":[]}
     loop.run_until_complete(aggregate(payload, res, num_records))
     res["results"].sort(key=lambda x: x["distance"])
     return res["results"][:num_records]
+
+@observer.eval_model_time.time()
+def extract_features_wrapper(path, model):
+    return extract_features(path, model).tolist()
 
 @app.route("/")
 def index():
@@ -90,13 +94,10 @@ def search():
     use_json = request.args.get('json', type=bool)
     size= request.args.get('size', type=int) or 10
 
-    results = search_from_index([], size) 
     if request.files and request.files['record'] and allowed_file(request.files['record'].filename): 
         file = request.files['record']
         path = save_file(file)
-        feature_vector = extract_features(path, model)
-        payload = feature_vector.tolist()
-
+        payload = extract_features_wrapper(path, model)
         results = search_from_index(payload, size) 
 
         return json.dumps(results) if use_json else render_template("index.html", results = results)
