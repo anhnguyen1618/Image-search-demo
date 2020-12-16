@@ -1,10 +1,16 @@
 import sys, os, json, requests
+import argparse
 
 sys.path.append(os.path.abspath('../bucket'))
 sys.path.append(os.path.abspath('../utilities'))
 
 from bucket import Bucket
 from utilities import allowed_file
+
+
+result_size = 30 
+relevant = 10
+
 
 
 class Ingestor:
@@ -23,6 +29,7 @@ class Ingestor:
     def upload_folder(self, dir_path):
         print(f"Begin uploading dir {dir_path}")
         file_names = self.read_dir(dir_path)
+        counter = 0
         for file_name in file_names:
             bucket_file_name = self.bucket.upload(file_name)
             x = requests.post(self.rabbitmq_url,
@@ -32,7 +39,12 @@ class Ingestor:
                               })
             if x.status_code != 200:
                 print(x.status_code)
+                print(x.reason)
                 print(f"Request fails for image: {bucket_file_name}")
+
+            counter += 1
+            if counter % 100 == 0:
+                print(f"Uploaded {counter}/{len(file_names)} files !!!")
 
         print(
             f"Done with uploading {len(file_names)} images to bucket {self.bucket_name}"
@@ -40,15 +52,20 @@ class Ingestor:
 
 
 if __name__ == "__main__":
-    BUCKET_NAME = "images-search"
-    model_name = "resnet"
-    QUEUE_NAME = model_name
-    RABBITMQ_URL = "http://rabbitmq-wrapper-mongo.rahtiapp.fi"
-    # RABBITMQ_URL = "http://localhost:8000"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-b", "--bucket", type=str, help="Google bucket name")
+    parser.add_argument("-q", "--queue", type=str, help="Queue name")
+    parser.add_argument("-d", "--dir", type=str, help="Dir to upload")
+    args = parser.parse_args()
+    BUCKET_NAME = args.bucket or "images-search"
+    QUEUE_NAME = args.queue or "resnet" 
 
-    ingestor = Ingestor(BUCKET_NAME, RABBITMQ_URL, QUEUE_NAME)
     # data_dir = "../dataset"
     # data_dir = "../dataset-10"
     data_dir = "../sample"
-    # data_dir = "../test"
+
+    DATA_DIR = args.dir or data_dir 
+    RABBITMQ_URL = "http://rabbitmq-wrapper-mongo.rahtiapp.fi"
+    # RABBITMQ_URL = "http://localhost:8000"
+    ingestor = Ingestor(BUCKET_NAME, RABBITMQ_URL, QUEUE_NAME)
     ingestor.upload_folder(data_dir)

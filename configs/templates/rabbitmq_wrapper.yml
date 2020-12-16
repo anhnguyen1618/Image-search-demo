@@ -34,3 +34,10 @@ spec:
         imagePullPolicy: Always 
         ports:
         - containerPort: 5000
+        volumeMounts:
+          - name: myclaim 
+            mountPath: /usr/app/tmp
+      volumes:
+        - name: myclaim 
+          persistentVolumeClaim:
+            claimName: myclaim

@@ -53,7 +53,7 @@ class Worker:
         credentials = pika.PlainCredentials('admin', 'admin')
         self.connection = pika.BlockingConnection(pika.ConnectionParameters(host_name, credentials=credentials)) 
         self.channel = self.connection.channel() 
-        self.channel.queue_declare(queue=queue_name)
+        self.channel.queue_declare(queue=queue_name, durable=True)
         self.channel_name = "features"
         self.channel.exchange_declare(exchange=self.channel_name, exchange_type="fanout", durable=True)
         self.channel.queue_bind(exchange=self.channel_name,
