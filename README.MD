@@ -205,6 +205,13 @@ There are 2 parts of the whole process:
 * Use model that are less expensive (for example, `mobilenet` is 6-7 times faster than `Vgg-16` or 2-3 times faster than `resnet`) but provide lower accuracy as a tradeoff.
 * I would love to discuss more on this topic.
 
+## Elasticity:
+* The system is built with micro-services connecting to each other via message broker and rest api. Which is quite flexible in terms of change in each component. Adding new Tensorflow models requires adding url of the model in the config file, change a few parameters, reconverting images to new feature vectors, then dumb to db, index and serve. With the help of Load balancers and Kubernetes, we can change model in roll-out fashion.
+
+## Resiliency:
+* System resiliency can be achieve by monitoring and logging to detect bottlenecks (the web server in this case). Kubernetes allows certain level of availability by restarting pod if it crashes. Unfortunately, The auto scaler of Openshift Rahti cloud doesn't work at all so we need to develop some sorts of monitoring and autoscaler by ourselves.
+* However, the problem with the system is that there is no deduplication in the system. This could cause the problem because no one wants to look for an image and discover 100 identical images. I have thought about this problem and an initial solution is to deduplicate at the time of ingestion. However, it is hard to do in the context of distributed system. Hence, one solution is probably running an Airflow job that pull the data from db and perform deduplication. It could works since it doesn't disturb the main flow of the data since we don't read db that often thanks to the indexing.
+
 
 
 
