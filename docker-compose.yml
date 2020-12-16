@@ -1,79 +1,62 @@
 version: "2"
 services:
-    # serving-mobilenet:
-    #     image: extractor_rest:v2 
-    #     build: 
-    #         context: ./ 
-    #         dockerfile: extractors/Dockerfile 
-    #     ports:
-    #         - "5500:5000"
-    #     environment:
-    #         - TOTAL_NUM_INDEXES=1
-    #         - ML_MODEL=inception
-    #         - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
-    #     volumes:
-    #         - ./extractors:/usr/app
-    #         - ./extractors/extractor_server.py:/usr/app/app.py
-    #         - ./utilities/utilities.py:/usr/app/utilities.py
+    serving-mobilenet:
+        image: extractor_rest:v2 
+        build: 
+            context: ./ 
+            dockerfile: extractors/Dockerfile 
+        ports:
+            - "5500:5000"
+        environment:
+            - TOTAL_NUM_INDEXES=1
+            - ML_MODEL=inception
+            - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
+        volumes:
+            - ./extractors:/usr/app
+            - ./extractors/extractor_server.py:/usr/app/app.py
+            - ./utilities/utilities.py:/usr/app/utilities.py
 
-    # indexing-inception-1:
-    #     container_name: indexing-inception-1 
-    #     image: indexing
-    #     build: 
-    #         context: ./ 
-    #         dockerfile: index/Dockerfile 
-    #     ports:
-    #         - "9000:5000"
-    #     environment:
-    #         - TOTAL_NUM_INDEXES=1
-    #         - CURRENT_INDEX=1
-    #         - ML_MODEL=inception
-    #         - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
-    #         - INDEX_ALGORITHM=kd_tree
-    #     volumes:
-    #         - ./index:/usr/app
-    #         - ./index/index_server.py:/usr/app/app.py
-    #         - ./utilities/utilities.py:/usr/app/utilities.py
-    #     depends_on: 
-    #         - mongos
+    indexing-inception-1:
+        container_name: indexing-inception-1 
+        image: indexing
+        build: 
+            context: ./ 
+            dockerfile: index/Dockerfile 
+        ports:
+            - "9000:5000"
+        environment:
+            - TOTAL_NUM_INDEXES=1
+            - CURRENT_INDEX=1
+            - ML_MODEL=inception
+            - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
+            - INDEX_ALGORITHM=kd_tree
+        volumes:
+            - ./index:/usr/app
+            - ./index/index_server.py:/usr/app/app.py
+            - ./utilities/utilities.py:/usr/app/utilities.py
+        depends_on: 
+            - mongos
 
-    # indexing-2:
-    #     container_name: indexing-2
-    #     image: indexing
-    #     build: 
-    #         context: ./ 
-    #         dockerfile: index/Dockerfile  
-    #     ports:
-    #         - "9001:5000"
-    #     environment:
-    #         - TOTAL_NUM_INDEXES=2
-    #         - CURRENT_INDEX=1
-    #         - ML_MODEL="resnet"
-    #     volumes:
-    #         - ./index:/usr/app
-    #     depends_on: 
-    #         - mongos
-
-    # extract_worker:
-    #     container_name: extract_worker
-    #     build: 
-    #         context: ./ 
-    #         dockerfile: extract_worker/Dockerfile
-    #     image: extract_worker 
-    #     environment:
-    #         - ML_MODEL=inception
-    #         - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
-    #         - DEDUPLICATE_MODEL=mobilenet
-    #         - DEDUPLICATE_THRESHOLD=0
-    #     depends_on: 
-    #         - rabbitmq
-    #     ports:
-    #         - "4000:5000"
-    #     volumes:
-    #         - ./extract_worker:/usr/app
-    #         - ./bucket/bucket.py:/usr/app/bucket.py
-    #         - ./utilities/utilities.py:/usr/app/utilities.py
-    #         - ./extractors/extractors.py:/usr/app/extractors.py
+    extract_worker:
+        container_name: extract_worker
+        build: 
+            context: ./ 
+            dockerfile: extract_worker/Dockerfile
+        image: extract_worker 
+        environment:
+            - ML_MODEL=inception
+            - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
+            - DEDUPLICATE_MODEL=mobilenet
+            - DEDUPLICATE_THRESHOLD=0
+        depends_on: 
+            - rabbitmq
+        ports:
+            - "4000:5000"
+        volumes:
+            - ./extract_worker:/usr/app
+            - ./bucket/bucket.py:/usr/app/bucket.py
+            - ./utilities/utilities.py:/usr/app/utilities.py
+            - ./extractors/extractors.py:/usr/app/extractors.py
 
     rabbitmq:
         image: "rabbitmq:3-management"
@@ -99,11 +82,11 @@ services:
         ports:
             - "8000:5000"
 
-    # mongos:
-    #     container_name: mongos
-    #     image: mongo:4.2.0
-    #     volumes:
-    #         - ./mongo-volume:/data/db
-    #     ports:
-    #         - "1048:27017"
+    mongos:
+        container_name: mongos
+        image: mongo:4.2.0
+        volumes:
+            - ./mongo-volume:/data/db
+        ports:
+            - "1048:27017"
     
