@@ -17,7 +17,6 @@ services:
             - ./utilities/utilities.py:/usr/app/utilities.py
 
     indexing-inception-1:
-        container_name: indexing-inception-1 
         image: indexing
         build: 
             context: ./ 
@@ -38,11 +37,10 @@ services:
             - mongos
 
     extract_worker:
-        container_name: extract_worker
+        image: extract_worker 
         build: 
             context: ./ 
             dockerfile: extract_worker/Dockerfile
-        image: extract_worker 
         environment:
             - ML_MODEL=inception
             - MODEL_URL="https://storage.googleapis.com/images-search/model-finetuned.h5"
@@ -70,7 +68,6 @@ services:
         - './rabbitmq_data:/data'
     
     rabbitmq_wrapper:
-        container_name: rabbitmq_wrapper
         image: rabbitmq_wrapper
         build: 
             context: ./ 
@@ -83,7 +80,6 @@ services:
             - "8000:5000"
 
     mongos:
-        container_name: mongos
         image: mongo:4.2.0
         volumes:
             - ./mongo-volume:/data/db
