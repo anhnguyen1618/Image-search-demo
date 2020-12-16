@@ -46,7 +46,7 @@ spec:
             mountPath: /usr/app/tmp
         env:
         - name: TOTAL_NUM_INDEXES 
-          value: "1"
+          value: "2"
         - name: CURRENT_INDEX 
           value: "1"
         - name: ML_MODEL 
@@ -54,7 +54,7 @@ spec:
         - name: MODEL_URL 
           value: "" 
         - name: INDEX_ALGORITHM
-          value: "kd_tree"
+          value: "brute"
       volumes:
         - name: myclaim 
           persistentVolumeClaim:

@@ -341,10 +341,10 @@ def clean_and_apply():
     # os.chdir("configs")
     execute(f"rm -r {main_dir} && mv {stage_dir} {main_dir} && mkdir {stage_dir}  && oc apply -f {main_dir}")
     execute("oc exec -it $(oc get pod -l app=prometheus -o=jsonpath='{.items[*].metadata.name}') -- sh -c 'kill -HUP 1'")
-    execute("sh expose.sh")
-    os.chdir(main_dir)
-    execute("bash mongo_config_db.sh")
-    execute("bash mongo_shard.sh")
+    # execute("sh expose.sh")
+    # os.chdir(main_dir)
+    # execute("bash mongo_config_db.sh")
+    # execute("bash mongo_shard.sh")
 
 if __name__ == '__main__':
     if not os.path.exists(stage_dir):

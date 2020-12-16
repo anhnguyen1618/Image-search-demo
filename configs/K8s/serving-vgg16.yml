@@ -56,7 +56,7 @@ spec:
             mountPath: /usr/app/tmp
         env:
         - name: TOTAL_NUM_INDEXES 
-          value: "1"
+          value: "2"
         - name: ML_MODEL 
           value: "vgg16"
         - name: MODEL_URL
