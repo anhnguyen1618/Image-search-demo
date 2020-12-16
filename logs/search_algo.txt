@@ -1,0 +1,38 @@
+Brute force 2
+{instance="indexing-custom-1-7f6b7dc959-xrfq5.indexing-custom-1.mongo.svc.cluster.local:5000",job="indexing-custom-1"}	0.15888193455446364
+{instance="indexing-custom-2-74845fbdd4-5zgbt.indexing-custom-2.mongo.svc.cluster.local:5000",job="indexing-custom-2"}	0.141830863284943
+{instance="indexing-inception-1-74fb9d9c8d-4tb5w.indexing-inception-1.mongo.svc.cluster.local:5000",job="indexing-inception-1"}	0.048898787743015454
+{instance="indexing-inception-2-5cbfb9758f-xvwhl.indexing-inception-2.mongo.svc.cluster.local:5000",job="indexing-inception-2"}	0.060712935893086364
+{instance="indexing-mobilenet-1-59cb7f4f7d-6z8t4.indexing-mobilenet-1.mongo.svc.cluster.local:5000",job="indexing-mobilenet-1"}	0.09937110778133357
+{instance="indexing-mobilenet-2-5bdb45b467-845ct.indexing-mobilenet-2.mongo.svc.cluster.local:5000",job="indexing-mobilenet-2"}	0.10851658748020188
+{instance="indexing-resnet-1-6c97fbbf5d-rxg44.indexing-resnet-1.mongo.svc.cluster.local:5000",job="indexing-resnet-1"}	0.08627623151495928
+{instance="indexing-resnet-2-78b7486c4c-5x658.indexing-resnet-2.mongo.svc.cluster.local:5000",job="indexing-resnet-2"}	0.09298207221813831
+{instance="indexing-vgg16-1-6d674c5956-kkkcb.indexing-vgg16-1.mongo.svc.cluster.local:5000",job="indexing-vgg16-1"}	0.13995988576025015
+{instance="indexing-vgg16-2-7fd59665cc-k2n9l.indexing-vgg16-2.mongo.svc.cluster.local:5000",job="indexing-vgg16-2"}	0.13776098319737295
+{instance="indexing-vgg19-1-768988d68f-64tmx.indexing-vgg19-1.mongo.svc.cluster.local:5000",job="indexing-vgg19-1"}	0.04047632347155585
+{instance="indexing-vgg19-2-6546d95bdd-4p7ql.indexing-vgg19-2.mongo.svc.cluster.local:5000",job="indexing-vgg19-2"}	0.06385718039276762
+---------------------------------------------------------
+Brute force 1
+{instance="indexing-custom-1-7f6b7dc959-xrfq5.indexing-custom-1.mongo.svc.cluster.local:5000",job="indexing-custom-1"}	0.09717548829949882
+{instance="indexing-inception-1-74fb9d9c8d-4tb5w.indexing-inception-1.mongo.svc.cluster.local:5000",job="indexing-inception-1"}	0.16877104021892275
+{instance="indexing-mobilenet-1-59cb7f4f7d-6z8t4.indexing-mobilenet-1.mongo.svc.cluster.local:5000",job="indexing-mobilenet-1"}	0.048297392031854805
+{instance="indexing-resnet-1-6c97fbbf5d-rxg44.indexing-resnet-1.mongo.svc.cluster.local:5000",job="indexing-resnet-1"}	0.16611544123684713
+{instance="indexing-vgg16-1-6d674c5956-kkkcb.indexing-vgg16-1.mongo.svc.cluster.local:5000",job="indexing-vgg16-1"}	0.0448610512945596
+{instance="indexing-vgg19-1-768988d68f-64tmx.indexing-vgg19-1.mongo.svc.cluster.local:5000",job="indexing-vgg19-1"}	0.05053537286650599
+========================================================
+Ball tree 1
+{instance="indexing-custom-1-cc54865fb-zpd4m.indexing-custom-1.mongo.svc.cluster.local:5000",job="indexing-custom-1"}	0.0037828880153467945
+{instance="indexing-inception-1-575df7d9b7-ts76s.indexing-inception-1.mongo.svc.cluster.local:5000",job="indexing-inception-1"}	0.034323644102075876
+{instance="indexing-mobilenet-1-5dbdd997c-684ft.indexing-mobilenet-1.mongo.svc.cluster.local:5000",job="indexing-mobilenet-1"}	0.020952531836329676
+{instance="indexing-resnet-1-669d69b995-5tscl.indexing-resnet-1.mongo.svc.cluster.local:5000",job="indexing-resnet-1"}	0.0403028960863594
+{instance="indexing-vgg16-1-b5c8c44d7-qcf2c.indexing-vgg16-1.mongo.svc.cluster.local:5000",job="indexing-vgg16-1"}	0.010485414260377487
+{instance="indexing-vgg19-1-6b49f64cf4-psw7s.indexing-vgg19-1.mongo.svc.cluster.local:5000",job="indexing-vgg19-1"}	0.012460923194885254
+{instance="indexing-vgg19-1-768988d68f-64tmx.indexing-vgg19-1.mongo.svc.cluster.local:5000",job="indexing-vgg19-1"}	0.05053537286650599
+========================================================
+Kd tree 1
+{instance="indexing-custom-1-cc54865fb-zpd4m.indexing-custom-1.mongo.svc.cluster.local:5000",job="indexing-custom-1"}	0.0025452799793030762
+{instance="indexing-inception-1-575df7d9b7-ts76s.indexing-inception-1.mongo.svc.cluster.local:5000",job="indexing-inception-1"}	0.050161911161616446
+{instance="indexing-mobilenet-1-5dbdd997c-684ft.indexing-mobilenet-1.mongo.svc.cluster.local:5000",job="indexing-mobilenet-1"}	0.023778365001873632
+{instance="indexing-resnet-1-669d69b995-5tscl.indexing-resnet-1.mongo.svc.cluster.local:5000",job="indexing-resnet-1"}	0.046324081612484795
+{instance="indexing-vgg16-1-b5c8c44d7-qcf2c.indexing-vgg16-1.mongo.svc.cluster.local:5000",job="indexing-vgg16-1"}	0.017233138274274428
+{instance="indexing-vgg19-1-6b49f64cf4-psw7s.indexing-vgg19-1.mongo.svc.cluster.local:5000",job="indexing-vgg19-1"}	0.016032662447259732
