@@ -1,18 +1,26 @@
 # Elastic image search 
 
+Project Report
+Author: Anh Nguyen 
+
+ha.a.nguyen@aalto.fi
+
+CS-E4660 - Advanced Topics in Software Systems, 09.09.2020-02.12.2020
+
 ## Objectives
-* Practice ML serving for image search
+* Practice ML serving for image search problem
 * Design and implement a horizontally scalable image search micro services 
-* Build a general framework that allows changing Tensorflow ML models easily
-* Practice monitoring
+* Build a general image search framework that allows changing Tensorflow ML models easily
+* Practice benchmark and monitoring 
 
 ## Technologies
 * Openshift running on Rahti CSC cloud
-* Tensorflow: ML model evaluator
+* Tensorflow: ML framework 
 * Scikit-learn: Vector clustering, search
 * Rabbitmq: Message queue
 * MongoDB: Document-origiented database
 * Prometheus: Monitoring tool
+* MLFlow: ML experiment tracking and metrics visualization tool
 
 ## Architecture:
 ![Architecture](./diagram.png "General architecture")
@@ -197,16 +205,22 @@ There are 2 parts of the whole process:
 
 * Each index server receives request and find the top X results that are closed to the query vector and return the score, image url to the web-server. This step can be solved using either bruteforce or hierachical clustering such as `Kdd_tree`. The web server then gather the results of each index, aggregate the results to generate the final X results.
 
-# Problems:
+# What is good about this demo project:
+
+* The system is built with micro-services connecting to each other via message broker and rest api. Which is quite flexible in terms of change in each component. Adding new Tensorflow models requires adding url of the model in the config file, change a few parameters, reconverting images to new feature vectors, then dumb to db, index and serve. With the help of Load balancers and Kubernetes, we can change model in roll-out fashion.
+* A centralized configuration file which acts as a single source of truth for setting up the servers, service discovery in declarative ways. This can help the observability and reasoning when problem arises.
+* Using observability tools such as prometheus and MLFlow to track and analyze the bottleneck in the system.
+
+# What could be improved:
 
 ## Scalability:
-* This system is horizontally scalable by adding more pods to distribute the load. However, the hardest problem at this scale comes from the part that needs vertical scaling. For example, if the search request take 1s in total, 0.8-0.9s are spent on converting image to vector and the rest for networking + search. In this particular demo, we also have constraints in the total number of CPU for each pod (1.6 vCPU). Hence, each server pod can barely handle 1 request at a time and it consumes 6Gb of Ram and 1.6 CPU just to handle 1 concurrent request for some large models(vgg19). The engineering mistake that I made here is that I put the logic for model computing, which is CPU-bound in this demo in the webserver. This seriously chokes the server due to the Global Intepreter Lock(GIL) in python. To mitigate the problem with GIL, multiprocessing(spawned new processes to handle concurrent requests) is used to alleviate the problem (Unfortunately, we have the quota of 1.6 vCPU, which doesn't bring much improvement in this case). Therefore, the system can only be scaled by adding more pods (the maximum quota is 50 but we need around 20 to run other services which leaves the remaining 30 for web-server)
+* This system is horizontally scalable by adding more pods to distribute the load. However, the hardest problem at this scale comes from the part that needs vertical scaling. For example, if the search request take 1s in total, 0.8-0.9s is spent on converting image to vector and the rest for networking + search. In this particular demo, we also have constraints in the total number of CPU for each pod (1.6 vCPU). Hence, each server pod can barely handle 1 request at a time and it consumes 6Gb of Ram and 1.6 CPU just to handle 1 concurrent request for some large models(vgg19). The engineering mistake that I made here is that I put the logic for model computing, which is CPU-bound in this demo in the webserver. This seriously chokes the server due to the Global Intepreter Lock(GIL) in python. To mitigate the problem with GIL, multiprocessing(spawned new processes to handle concurrent requests) is used to alleviate the problem (Unfortunately, we have the quota of 1.6 vCPU, which doesn't bring much improvement in this case). Therefore, the system can only be scaled by adding more pods (the maximum quota is 50 but we need around 20 to run other services which leaves the remaining 30 for web-server)
 ### Potential solutions:
 1. Using `gunicorn` web servers to spawn workers. Using threads, gevent doesn't help much with the CPU-bound task here due to Python GIL, adding more processes can circumvent the GIL problem. More information [here](https://medium.com/building-the-system/gunicorn-3-means-of-concurrency-efbb547674b7).
 
 Adding the additional worker does help increasing throughput slightly. However, it does add complexity when dealing with memory since each process has its own memory space. For example, imagine that you have to send a request to a service A at `http://a.fi/load-index` to update the data in memory of the server. However, there are 2 servers(processes) that stand behind the load balancer at `http://a.fi/load-index` and your request is routed to the first server, leaving the data in the second server staled. This is exactly the bug that I had when trying to update memory of the index server(2 gunicorn worker processes).
 
-2. A better architecture: Using serverless (AWS Lambda, Google Cloud Function) which spin up container for each request in order to convert the image to feature vector since it takes roughly a few seconds at most for processing 1 image. In the python web server, we use gthread of unicorn in order to send request to the serverless function since it is lightweight so it can handle I/O task well. This approach allows us to handle more concurrent requests with the web server while the expensive computation is handled by the cloud function. 
+2. A better architecture: Using serverless (AWS Lambda, Google Cloud Function) which spins up container for each request in order to convert the image to feature vector since it takes roughly a few seconds at most for processing 1 image. In the python web server, we use gthread of unicorn in order to send request to the serverless function since it is lightweight so it can handle I/O task well. This approach allows us to handle more concurrent requests with the web server while the expensive computation is handled by the cloud function. 
 
 3.Perhaps using GPU or higher-frequency CPU could help to processing image with ML model faster. 
 
@@ -214,14 +228,23 @@ Adding the additional worker does help increasing throughput slightly. However, 
 
 ## Resiliency:
 * System resiliency can be achieve by monitoring and logging to detect bottlenecks (the web server in this case). Kubernetes allows certain level of availability by restarting pod if it crashes. Unfortunately, The auto scaler of Openshift Rahti cloud doesn't work at all so we need to develop some sorts of monitoring and autoscaler by ourselves.
-* However, the problem with the system is that there is no deduplication mechanism in the system. This could cause the problem because no one wants to look for an image and discover 100 identical images.
+* However, the problem is that there is no deduplication mechanism in the system. This could cause the problem because no one wants to look for an image and discover 100 identical images.
 ### Potential solutions:
 * I have thought about this problem and an initial solution is to deduplicate at the time of ingestion. However, it is hard to do in the context of distributed system (multiple workers can process duplicated images at the same time and insert to db without knowing each other). Hence, one solution is probably running an Airflow job that pull the data from db and perform deduplication. This approach could work since it doesn't disturb the main flow of the data as we don't read db that often thanks to the in-memory indexing.
 
 ## Other minor issues:
 * Openshift doesn't allow external traffic going to Rabbitmq and Mongodb directly. The workarounds is to interact with Rabbitmq and Mongodb from internal service or expose a wrapper HTTP server to interact with those services. For example, I added a server just to send message from external to Rabbitmq.
-* You need to mount Persistent volume to container to write file in container even if those files are just temporary. This could be problematic for applications that need to write config file to some locations that already contains other configuration files. This means that if you mount the volume there, all other existing configuration files don't exist at execution time.
-* Normal users don't have permission to create Cluster Admin RBAC in CSC. This could be a problem for service discovery such as when running `prometheus`. The workaround is to extract Kubernetes data from outside, generate `ConfigMap` to mount into the container.  
+* You need to mount Persistent volume to container to write file in container even if those files are just temporary. This could be problematic for applications that need to write config file to some locations that already contains other configuration files. This means that if you mount the volume there so that the application can write configuration, all other existing configuration files stop existing at mount time.
+* Normal users don't have permission to create Cluster Admin RBAC in CSC. This could be a problem for service discovery such as when running `prometheus` or `fluentd`. The workaround is to extract Kubernetes data from outside the cluster, generate `ConfigMap` to mount config into the container.  
+* CSC Rahti cloud has problem with the limited image pulling rate for Dockerhub. The solution is to use other Image registries such as Google Cloud.
 
-## Elasticity:
-* The system is built with micro-services connecting to each other via message broker and rest api. Which is quite flexible in terms of change in each component. Adding new Tensorflow models requires adding url of the model in the config file, change a few parameters, reconverting images to new feature vectors, then dumb to db, index and serve. With the help of Load balancers and Kubernetes, we can change model in roll-out fashion.
+## Lesson learned:
+* It takes a huge amount of engineering efforts to bring an existing ML model to production. Often we have to deploy the model in constrained environments, which doesn't work well with complex models since they typically requires more computing resources.
+* Put more focus on the elasticity of the system. It includes 2 parts: scalability and replaceability of components in the system.
+* Put more focus on the observability of the system early since it will pay off along the way. For example, track metrics, add logging and other observability measures early to save time when triaging problems. You can learn a lot from the metrics collected as the data does have tremendous influences on the architecture of the system. For example, if I detected the problem with the web layer early, I would had more time to switch to serverless for feature extraction.
+* Use orchestration as Airflow to schedule the execution of tasks in a systematic way.
+* Use proper web server such as gunicorn for Flask web application in production.
+* Avoid putting heavy task on the web layer. I should have created a different service for feature extraction.
+* Use tools for tracking experiment such as MLflow, which can ease the process of doing experiment.
+* Parameterize application as much as possible to make it easy to automate the experimenting process.
+* CSC Rahti Cloud with Openshift is cheap and easy to use for academic purposes. However, it does have some problems (Limited pulling rate for images from Dockerhub, limited Cluster Admin RBAC permission).
