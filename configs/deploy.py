@@ -4,6 +4,7 @@ from service_discovery_prometheus import GenConfig
 
 stage_dir = "./staging"
 main_dir = "./K8s"
+project_name = subprocess.getoutput("oc get project -o=jsonpath='{.items[*].metadata.name}'")
 
 class Common_generator:
     def __init__(self, data, model_meta = {}):
@@ -197,7 +198,7 @@ class Mongo(Common_generator):
         
         def gen_members(self, num_pods):
             def get_url(index):
-                return f"\\\"configdb-{index}.configdb.mongo.svc.cluster.local:27017\\\""
+                return f"\\\"configdb-{index}.configdb.{project_name}.svc.cluster.local:27017\\\""
             return ", ".join(["{" + f"_id : {index}, host : {get_url(index)}" + "}" for index in range(num_pods)])
 
         def gen(self, extra_data = None):
@@ -209,7 +210,7 @@ class Mongo(Common_generator):
             for service in services:
                 if service["name"] == "config_db":
                     num_config_dbs = service["pods"]
-                    return ", ".join([f"configdb-{i}.configdb.mongo.svc.cluster.local:27017" for i in range(num_config_dbs)])
+                    return ", ".join([f"configdb-{i}.configdb.{project_name}.svc.cluster.local:27017" for i in range(num_config_dbs)])
             return "" 
 
         def gen(self, services = None):
@@ -233,7 +234,7 @@ class Mongo(Common_generator):
 
         def gen_members(self, num_pods):
             def get_url(index):
-                return f"\\\"mongodb-shard$shards-{index}.mongodb-shard$shards.mongo.svc.cluster.local:27017\\\""
+                return f"\\\"mongodb-shard$shards-{index}.mongodb-shard$shards.{project_name}.svc.cluster.local:27017\\\""
 
             return ", ".join(["{" + f"_id : {index}, host : {get_url(index)}" + "}" for index in range(num_pods)])
         
@@ -323,10 +324,6 @@ class Generator:
 
 def execute(cmd):
     subprocess.run(cmd, shell=True)
-    # commands = cmd.split("&&")
-    # for cmd in commands:
-    #     cmd = cmd.strip()
-    #     subprocess.run(cmd.split(" "))
 
 
 def clean_and_apply():
@@ -340,13 +337,14 @@ def clean_and_apply():
     # execute("./build-docker-img.sh")
     # os.chdir("configs")
     execute(f"rm -r {main_dir} && mv {stage_dir} {main_dir} && mkdir {stage_dir}  && oc apply -f {main_dir}")
-    execute("oc exec -it $(oc get pod -l app=prometheus -o=jsonpath='{.items[*].metadata.name}') -- sh -c 'kill -HUP 1'")
-    # execute("sh expose.sh")
-    # os.chdir(main_dir)
-    # execute("bash mongo_config_db.sh")
-    # execute("bash mongo_shard.sh")
+    # execute("oc exec -it $(oc get pod -l app=prometheus -o=jsonpath='{.items[*].metadata.name}') -- sh -c 'kill -HUP 1'")
+    execute("sh expose.sh")
+    os.chdir(main_dir)
+    execute("bash mongo_config_db.sh")
+    execute("bash mongo_shard.sh")
 
 if __name__ == '__main__':
+
     if not os.path.exists(stage_dir):
         os.mkdir(stage_dir)
     

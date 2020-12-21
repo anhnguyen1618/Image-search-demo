@@ -58,7 +58,7 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--dir", type=str, help="Dir to upload")
     args = parser.parse_args()
     BUCKET_NAME = args.bucket or "images-search"
-    QUEUE_NAME = args.queue or "resnet" 
+    QUEUE_NAME = args.queue or "" 
 
     # data_dir = "../dataset"
     # data_dir = "../dataset-10"
@@ -68,4 +68,4 @@ if __name__ == "__main__":
     RABBITMQ_URL = "http://rabbitmq-wrapper-mongo.rahtiapp.fi"
     # RABBITMQ_URL = "http://localhost:8000"
     ingestor = Ingestor(BUCKET_NAME, RABBITMQ_URL, QUEUE_NAME)
-    ingestor.upload_folder(data_dir)
+    ingestor.upload_folder(DATA_DIR)

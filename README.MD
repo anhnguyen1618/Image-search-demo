@@ -248,3 +248,57 @@ Adding the additional worker does help increasing throughput slightly. However, 
 * Use tools for tracking experiment such as MLflow, which can ease the process of doing experiment.
 * Parameterize application as much as possible to make it easy to automate the experimenting process.
 * CSC Rahti Cloud with Openshift is cheap and easy to use for academic purposes. However, it does have some problems (Limited pulling rate for images from Dockerhub, limited Cluster Admin RBAC permission).
+
+## Instruction to run the demo:
+1. Login into Rahti CSC cloud:
+
+```bash
+oc login https://rahti.csc.fi:8443 --token=<YOUR_TOKEN_HERE>
+```
+
+2. Create Openshift project:
+
+```bash
+oc new-project <project_name>
+```
+For example, I created project called `mongo` using the command `oc new-project mongo` to run this project.
+
+3. Create a shared Persistent Volume Claim for all the services:
+```bash
+cd configs/templates && oc apply -f volume-claim.yml
+```
+
+4. Run deployment script:
+```bash
+python3 deploy.py
+```
+
+5. Wait until all pods are created and run service discovery for prometheus:
+```bash
+python3 service_discovery_prometheus.py
+```
+
+6. Run script to ingest images:
+```bash
+cd ../ingestor && python3 ingest.py -d ../dataset
+```
+
+7. When all the images are ingested into db, run reindexing:
+
+```bash
+cd ../configs && ./reindex.sh
+```
+
+8. To run experiment:
+Change parameter in `run_experiment.sh` and run
+```bash
+./run_experiment.sh
+```
+
+9. Visualize experiment results with MLFlow:
+```
+mlflow ui
+```
+The result is available at `localhost:5000`
+
+

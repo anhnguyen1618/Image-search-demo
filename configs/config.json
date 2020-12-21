@@ -26,27 +26,27 @@
       "models": [
         {
           "name": "resnet",
-          "pods": 0 
+          "pods": 1 
         },
         {
           "name": "mobilenet",
-          "pods": 0
+          "pods": 1
         },
         {
           "name": "custom",
-          "pods": 0
+          "pods": 1
         },
         {
           "name": "vgg16",
-          "pods": 0
+          "pods": 1
         },
         {
           "name": "vgg19",
-          "pods": 0
+          "pods": 1
         },
         {
           "name": "inception",
-          "pods": 0
+          "pods": 1
         }
       ]
     },
@@ -55,37 +55,37 @@
       "models": [
         {
           "name": "resnet",
-          "num_indexes": 2,
+          "num_indexes": 1,
           "pods": 1,
           "index_algorithm": "brute"
         },
         {
           "name": "mobilenet",
-          "num_indexes": 2,
+          "num_indexes": 1,
           "pods": 1,
           "index_algorithm": "brute"
         },
         {
           "name": "custom",
-          "num_indexes": 2,
+          "num_indexes": 1,
           "pods": 1,
           "index_algorithm": "brute"
         },
         {
           "name": "vgg16",
-          "num_indexes": 2,
+          "num_indexes": 1,
           "pods": 1,
           "index_algorithm": "brute"
         },
         {
           "name": "vgg19",
-          "num_indexes": 2,
+          "num_indexes": 1,
           "pods": 1,
           "index_algorithm": "brute"
         },
         {
           "name": "inception",
-          "num_indexes": 2,
+          "num_indexes": 1,
           "pods": 1,
           "index_algorithm": "brute"
         }

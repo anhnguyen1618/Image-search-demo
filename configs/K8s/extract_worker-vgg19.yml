@@ -20,7 +20,7 @@ kind: Deployment
 metadata:
   name: extract-worker-vgg19
 spec:
-  replicas: 0 
+  replicas: 1 
   selector:
     matchLabels:
       app: extract-worker-vgg19
