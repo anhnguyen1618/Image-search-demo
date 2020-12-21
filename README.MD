@@ -3,8 +3,6 @@
 Project Report
 Author: Anh Nguyen 
 
-ha.a.nguyen@aalto.fi
-
 CS-E4660 - Advanced Topics in Software Systems, 09.09.2020-02.12.2020
 
 ## Objectives
