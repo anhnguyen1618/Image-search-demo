@@ -301,4 +301,6 @@ The result is available at `localhost:5000`
 
 Deployment demo [link](https://aalto.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=ae5a266b-c27f-4327-aab8-ac98011bd8fc)
 
+Don't forget to supply your Google Cloud bucket `YOUR_GOOGLE_BUCKET_KEY` in `extract_worker/key.json`
+
 
