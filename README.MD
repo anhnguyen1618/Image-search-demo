@@ -275,25 +275,26 @@ python3 deploy.py
 ```bash
 python3 service_discovery_prometheus.py
 ```
+6. Download Caltech image dataset [here](https://drive.google.com/drive/folders/1Ulw9ohUoXpV4gr0n_f8WaZ6-f9I70OBI?usp=sharing)
 
-6. Run script to ingest images:
+7. Run script to ingest images:
 ```bash
 cd ../ingestor && python3 ingest.py -d ../dataset
 ```
 
-7. When all the images are ingested into db, run reindexing:
+8. When all the images are ingested into db, run reindexing:
 
 ```bash
 cd ../configs && ./reindex.sh
 ```
 
-8. To run experiment:
+9. To run experiment:
 Change parameter in `run_experiment.sh` and run
 ```bash
 ./run_experiment.sh
 ```
 
-9. Visualize experiment results with MLFlow:
+10. Visualize experiment results with MLFlow:
 ```
 mlflow ui
 ```
